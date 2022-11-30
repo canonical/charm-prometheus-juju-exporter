@@ -7,37 +7,37 @@ name: prometheus-juju-exporter
  
 # The following metadata are human-readable and will be published prominently on Charmhub.
 
-# (Recommended)
-display-name: Charm Template
+display-name: Prometheus Juju Exporter
 
-# (Required)
-summary: A very short one-line summary of the charm.
+summary: Charm that exports statistics about number of juju-deployed machines
 
 description: |
-  A single sentence that says what the charm is, concisely and memorably.
+  This charm exposes a `/metrics` endpoint for Prometheus that provides statistics
+  about machines deployed by juju controller. It connects to configured juju controller
+  and collects information about machines from every model.
 
-  A paragraph of one to three short sentences, that describe what the charm does.
+  The metrics provide information about machines' states (UP or DOWN) and can be used
+  to calculate how many machines are managed by juju controller and in which state they
+  are. For more detailed information about exposed metrics and their format see
+  prometheus-juju-exporter snap documentation
 
-  A third paragraph that explains what need the charm meets.
+  TODO: include link to snap
 
-  Finally, a paragraph that describes whom the charm is useful for.
+subordinate: True
 
-# The containers and resources metadata apply to Kubernetes charms only.
-# Remove them if not required.
-
-# Your workload’s containers.
-containers:
-  httpbin:
-    resource: httpbin-image
-
-# This field populates the Resources tab on Charmhub.
 resources:
-  # An OCI image resource for each container listed above.
-  # You may remove this if your charm will run without a workload sidecar container.
-  httpbin-image:
-    type: oci-image
-    description: OCI image for httpbin
-    # The upstream-source field is ignored by Juju. It is included here as a reference
-    # so the integration testing suite knows which image to deploy during testing. This field
-    # is also used by the 'canonical/charming-actions' Github action for automated releasing.
-    upstream-source: kennethreitz/httpbin
+  exporter-snap:
+    type: file
+    description: |
+      (Optional) Snap that implements actual data collection and export. If not provided, charm
+      will try to download prometheus-juju-exporter from snap store.
+    filename: prometheus-juju-exporter.snap
+
+provides:
+  prometheus-scrape:
+    interface: prometheus
+
+requires:
+  general-info:
+    interface: juju-info
+    scope: container
