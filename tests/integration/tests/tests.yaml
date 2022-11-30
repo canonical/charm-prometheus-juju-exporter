@@ -1,0 +1,17 @@
+gate_bundles:
+  - jammy
+
+tests:
+  - tests.test_charm.BasicPrometheusJujuExporterTests
+
+configure:
+  - tests.configure_charm.setup_juju_credentials
+
+target_deploy_status:
+  prometheus-juju-exporter:
+    workload-status: blocked
+    workload-status-message-prefix: Invalid configuration
+  ubuntu:
+    workload-status-message-prefix: ""
+  juju-local:
+    workload-status-message-prefix: ""
