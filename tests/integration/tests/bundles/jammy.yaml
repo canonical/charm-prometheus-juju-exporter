@@ -1,0 +1,28 @@
+series: jammy
+
+applications:
+  ubuntu:
+    charm: ch:ubuntu
+    num_units: 1
+
+  juju-local:
+    charm: bootstack-charmers-juju-local
+    num_units: 0
+
+  prometheus-juju-exporter:
+    charm: ../../../../prometheus-juju-exporter.charm
+    num_units: 0
+    resources:
+      exporter-snap: ../../../../exporter.snap
+
+  prometheus:
+    charm: ch:prometheus2
+    num_units: 1
+
+relations:
+  - - "ubuntu"
+    - "prometheus-juju-exporter"
+  - - "ubuntu"
+    - "juju-local"
+  - - "prometheus-juju-exporter"
+    - "prometheus"
