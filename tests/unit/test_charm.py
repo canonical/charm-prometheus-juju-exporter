@@ -153,8 +153,8 @@ def test_generate_exporter_config_complete(harness, mocker):
 
 
 def test_generate_exporter_config_incomplete(harness, mocker):
-    """Test that generated config won't contain keys for missing config options."""
-    expected_missing_config = {"juju": ["controller", "user", "password"]}
+    """Test that generated config will have 'None' values for missing config options."""
+    expected_missing_config = {"juju": ["controller_endpoint", "username", "password"]}
     expected_present_config = {"exporter": ["collect_interval", "port"]}
     mocker.patch.object(harness.charm, "get_controller_ca", return_value="ca")
 
@@ -173,11 +173,11 @@ def test_generate_exporter_config_incomplete(harness, mocker):
 
     for section, missing_keys in expected_missing_config.items():
         for key in missing_keys:
-            assert key not in snap_config[section]
+            assert not snap_config[section][key]
 
     for section, present_keys in expected_present_config.items():
         for key in present_keys:
-            assert key in snap_config[section]
+            assert snap_config[section][key]
 
 
 @pytest.mark.parametrize("error", [True, False])
