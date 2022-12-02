@@ -60,7 +60,7 @@ def setup_juju_credentials() -> None:
     model.set_application_config(
         "prometheus-juju-exporter",
         {
-            "organization": "Test org",
+            "customer": "Test org",
             "cloud-name": "Test Cloud",
             "controller-url": endpoint,
             "controller-ca": b64encode(ca_cert.encode()).decode(encoding="ascii"),
