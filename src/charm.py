@@ -31,7 +31,7 @@ from prometheus_interface.operator import (
     PrometheusScrapeTarget,
 )
 
-from exporter import ExporterConfigError, ExporterSnap
+from exporter import ExporterConfig, ExporterConfigError, ExporterSnap
 
 # Log messages can be retrieved using juju debug-log
 logger = logging.getLogger(__name__)
@@ -115,33 +115,20 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         return ca_cert
 
-    def generate_exporter_config(self) -> Dict[str, Any]:
+    def generate_exporter_config(self) -> Dict[str, Dict[str, Optional[str]]]:
         """Generate exporter service config based on the values from charm config."""
-        exporter_config: Dict[str, Any] = {}
-        # transform charm config into snaps' configuration file
-        for charm_option, snap_option in self.SNAP_CONFIG_MAP.items():
-            value = self.config[charm_option]
-            if not value:
-                continue
+        config = ExporterConfig(
+            customer=self.config.get("customer"),
+            cloud=self.config.get("cloud-name"),
+            controller=self.config.get("controller-url"),
+            ca_cert=self.get_controller_ca(),
+            user=self.config.get("juju-user"),
+            password=self.config.get("juju-password"),
+            interval=self.config.get("scrape-interval"),
+            port=self.config.get("scrape-port"),
+        )
 
-            # Parse dot-separated snap config name and inject value to the final config
-            option_id = snap_option.split(".")
-            option_path = option_id[:-1]
-            option_name = option_id[-1]
-            slice_ = exporter_config
-            for identifier in option_path:
-                if identifier not in slice_:
-                    slice_[identifier] = {}
-                slice_ = slice_[identifier]
-            slice_[option_name] = value
-
-        # inject CA certificate that's automatically detected by charm
-        if "juju" not in exporter_config:
-            exporter_config["juju"] = {}
-
-        exporter_config["juju"]["controller_cacert"] = self.get_controller_ca()
-
-        return exporter_config
+        return config.render()
 
     def reconfigure_scrape_target(self) -> None:
         """Update scrape target configuration in related Prometheus application.

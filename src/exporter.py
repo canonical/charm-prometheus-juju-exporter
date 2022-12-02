@@ -9,7 +9,7 @@ Module focused on handling operations related to prometheus-juju-exporter snap.
 import logging
 import os
 import subprocess
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, NamedTuple, Optional
 
 import yaml
 from charmhelpers.fetch import snap
@@ -20,6 +20,38 @@ logger = logging.getLogger(__name__)
 
 class ExporterConfigError(Exception):
     """Indicates problem with configuration of exporter service."""
+
+
+class ExporterConfig(NamedTuple):
+    """Data class that holds information required for exporter configuration."""
+
+    customer: Optional[str] = None
+    cloud: Optional[str] = None
+    controller: Optional[str] = None
+    ca_cert: Optional[str] = None
+    user: Optional[str] = None
+    password: Optional[str] = None
+    interval: Optional[str] = None
+    port: Optional[str] = None
+
+    def render(self) -> Dict[str, Dict[str, Optional[str]]]:
+        """Return dict that can be written to an exporter config file as a yaml."""
+        return {
+            "customer": {
+                "name": self.customer,
+                "cloud_name": self.cloud,
+            },
+            "juju": {
+                "controller_endpoint": self.controller,
+                "controller_cacert": self.ca_cert,
+                "username": self.user,
+                "password": self.password,
+            },
+            "exporter": {
+                "collect_interval": self.interval,
+                "port": self.port,
+            },
+        }
 
 
 class ExporterSnap:
