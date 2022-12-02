@@ -109,7 +109,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     """Test generating complete config file for exporter snap."""
     port = 5000
     controller = "juju-controller:17070"
-    organization = "Test Org"
+    customer = "Test Org"
     cloud = "Test cloud"
     ca_cert = "--- CA CERT DATA ---"
     user = "foo"
@@ -119,7 +119,7 @@ def test_generate_exporter_config_complete(harness, mocker):
 
     expected_snap_config = {
         "customer": {
-            "name": organization,
+            "name": customer,
             "cloud_name": cloud,
         },
         "exporter": {
@@ -137,7 +137,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     with harness.hooks_disabled():
         harness.update_config(
             {
-                "organization": organization,
+                "customer": customer,
                 "cloud-name": cloud,
                 "controller-url": controller,
                 "juju-user": user,
