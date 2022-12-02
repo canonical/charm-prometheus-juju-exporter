@@ -5,9 +5,9 @@
 
 options:
   # An example config option to customise the log level of the workload
-  organization:
+  customer:
     description: |
-      Name of the organization that will be added as label to collected metrics. It's useful when
+      Name of the customer that will be added as label to collected metrics. It's useful when
       Prometheus collects metrics from multiple organizations/customers.
     default: ""
     type: string

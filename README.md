@@ -62,7 +62,7 @@ user/password (usually found in `~/.local/share/juju/accounts.yaml`).
 
 Required options:
 
-* `organization`
+* `customer`
 * `cloud-name`
 * `controller-url`
 * `juju-user`
@@ -113,7 +113,7 @@ At this point the unit of `prometheus-juju-exporter` should be in `Blocked` stat
 crucial configuration options. Following is a sample configuration:
 ```
 juju config prometheus-juju-exporter \
-  organization="Test Org" \
+  customer="Test Org" \
   cloud-name="Test Cloud" \
   controller-url="10.75.224.63:17070" \
   juju-user=admin \
