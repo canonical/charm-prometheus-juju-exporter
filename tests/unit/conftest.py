@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 #
 # Learn more about testing at: https://juju.is/docs/sdk/testing
-"""Fixture for charms' unti tests."""
+"""Fixture for charm's unit tests."""
 
 import ops.testing
 import pytest

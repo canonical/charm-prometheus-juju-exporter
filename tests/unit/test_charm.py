@@ -59,50 +59,55 @@ def test_snap_path_property(resource_exists, resource_size, expect_path, harness
     assert harness.charm.snap_path == expected_path
 
 
-@pytest.mark.parametrize(
-    "agent_conf_data, expect_fail",
-    [
-        ({"cacert": "CA\nDATA"}, False),
-        ({}, True),
-    ],
-)
-def test_get_controller_ca_from_file(agent_conf_data, expect_fail, harness, mocker):
-    """Test parsing CA cert data out of agent.conf."""
+def test_get_controller_ca_from_file_success(harness, mocker):
+    """Test successfully parsing CA cert data out of an agent.conf file."""
     charm_path = "/var/lib/juju/agents/unit-0/charm/"
     agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
+    agent_conf_data = {"cacert": "CA DATA"}
     agent_conf_content = yaml.safe_dump(agent_conf_data, indent=2)
     mocker.patch.object(charm.hookenv, "charm_dir", return_value=charm_path)
 
     with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
-        if expect_fail:
-            with pytest.raises(RuntimeError):
-                harness.charm.get_controller_ca()
-        else:
-            expected_ca_cert = agent_conf_data["cacert"]
-            ca_cert = harness.charm.get_controller_ca()
-            assert ca_cert == expected_ca_cert
+        expected_ca_cert = agent_conf_data["cacert"]
+        ca_cert = harness.charm.get_controller_ca()
+        assert ca_cert == expected_ca_cert
 
     open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
 
 
-@pytest.mark.parametrize(
-    "ca_data, expect_fail",
-    [
-        ("this_is-not valid b64", True),
-        ("VGhpcyBpcyB2YWxpZCBDQQ==", False),
-    ],
-)
-def test_get_controller_ca_from_config(ca_data, expect_fail, harness):
-    """Test parsing CA certificate from config option."""
+def test_get_controller_ca_from_file_fail(harness, mocker):
+    """Test failure when CA cert can't be parsed out of an agent.conf file."""
+    charm_path = "/var/lib/juju/agents/unit-0/charm/"
+    agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
+    agent_conf_data = {}
+    agent_conf_content = yaml.safe_dump(agent_conf_data, indent=2)
+    mocker.patch.object(charm.hookenv, "charm_dir", return_value=charm_path)
+
+    with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
+        with pytest.raises(RuntimeError):
+            harness.charm.get_controller_ca()
+
+    open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
+
+
+def test_get_controller_ca_from_config_success(harness):
+    """Test successfully parsing CA certificate from config option."""
+    ca_data = "VGhpcyBpcyB2YWxpZCBDQQ=="
     with harness.hooks_disabled():
         harness.update_config({"controller-ca": ca_data})
 
-    if expect_fail:
-        with pytest.raises(RuntimeError):
-            harness.charm.get_controller_ca()
-    else:
-        expected_data = b64decode(ca_data).decode(encoding="ascii")
-        assert expected_data == harness.charm.get_controller_ca()
+    expected_data = b64decode(ca_data).decode(encoding="ascii")
+    assert expected_data == harness.charm.get_controller_ca()
+
+
+def test_get_controller_ca_from_config_fail(harness):
+    """Test failure when parsing CA certificate from config option."""
+    ca_data = "this_is-not valid b64"
+    with harness.hooks_disabled():
+        harness.update_config({"controller-ca": ca_data})
+
+    with pytest.raises(RuntimeError):
+        harness.charm.get_controller_ca()
 
 
 def test_generate_exporter_config_complete(harness, mocker):
@@ -180,9 +185,8 @@ def test_generate_exporter_config_incomplete(harness, mocker):
             assert snap_config[section][key]
 
 
-@pytest.mark.parametrize("error", [True, False])
-def test_reconfigure_scrape_target(error, harness, mocker):
-    """Test updating scrape target of Prometheus."""
+def test_reconfigure_scrape_target_success(harness, mocker):
+    """Test updating scrape target of Prometheus successfully."""
     port = 5000
     interval_min = 5
     interval_sec = interval_min * 60
@@ -196,17 +200,29 @@ def test_reconfigure_scrape_target(error, harness, mocker):
             {"scrape-port": port, "scrape-interval": interval_min, "scrape-timeout": timeout}
         )
 
+    harness.charm.reconfigure_scrape_target()
+    expose_target_mock.assert_called_once_with(
+        port, "/metrics", scrape_interval=f"{interval_sec}s", scrape_timeout=f"{timeout}s"
+    )
+
+
+def test_reconfigure_scrape_target_fail(harness, mocker):
+    """Test failure when updating scrape target of Prometheus."""
+    expose_target_mock = mocker.patch.object(
+        harness.charm.prometheus_target, "expose_scrape_target"
+    )
+    logger_mock = mocker.patch.object(charm, "logger")
+
     # re-raise error in case the prometheus target configuration fails
-    if error:
-        expose_target_mock.side_effect = charm.PrometheusConfigError
-        with pytest.raises(charm.PrometheusConfigError):
-            harness.charm.reconfigure_scrape_target()
-    # execute prometheus target reconfiguration
-    else:
+    exception = charm.PrometheusConfigError()
+    expose_target_mock.side_effect = exception
+    with pytest.raises(charm.PrometheusConfigError):
         harness.charm.reconfigure_scrape_target()
-        expose_target_mock.assert_called_once_with(
-            port, "/metrics", scrape_interval=f"{interval_sec}s", scrape_timeout=f"{timeout}s"
-        )
+
+    logger_mock.error.assert_called_once_with(
+        "Failed to configure prometheus scrape target: %s",
+        exception
+    )
 
 
 def test_reconfigure_open_ports(harness, mocker):

@@ -101,13 +101,8 @@ def test_validate_config():
         pytest.fail("Configuration expected to pass but did not.")
 
 
-@pytest.mark.parametrize("failed", [True, False])
-def test_apply_config(failed, mocker):
-    """Test applying snap configuration.
-
-    It can either pass or fail. In case of failre, old config should not be overwritten
-    and the service should remain stopped.
-    """
+def test_apply_config_success(mocker):
+    """Test successfully applying snap configuration."""
     mock_stop = mocker.patch.object(exporter.ExporterSnap, "stop")
     mock_start = mocker.patch.object(exporter.ExporterSnap, "start")
     mock_dump = mocker.patch.object(exporter.yaml, "safe_dump")
@@ -115,26 +110,38 @@ def test_apply_config(failed, mocker):
     config = {"valid": "config"}
     exporter_ = exporter.ExporterSnap()
 
-    if failed:
-        mock_validate.side_effect = exporter.ExporterConfigError
-        with patch("builtins.open", new_callable=mock_open):
-            with pytest.raises(exporter.ExporterConfigError):
-                exporter_.apply_config(config)
+    with patch("builtins.open", new_callable=mock_open) as file_:
+        exporter_.apply_config(config)
 
         mock_stop.assert_called_once_with()
         mock_validate.assert_called_once_with(config)
-        mock_dump.assert_not_called()
-        mock_start.assert_not_called()
+        mock_dump.assert_called_once_with(config, ANY)
+        file_.assert_called_once_with(exporter_.SNAP_CONFIG_PATH, "w", encoding="utf-8")
+        mock_start.assert_called_once_with()
 
-    else:
-        with patch("builtins.open", new_callable=mock_open) as file_:
+
+def test_apply_config_fail(mocker):
+    """Test failure to apply snap configuration.
+
+    In case of failure, old config should not be overwritten
+    and the service should remain stopped.
+    """
+    mock_stop = mocker.patch.object(exporter.ExporterSnap, "stop")
+    mock_start = mocker.patch.object(exporter.ExporterSnap, "start")
+    mock_dump = mocker.patch.object(exporter.yaml, "safe_dump")
+    mock_validate = mocker.patch.object(exporter.ExporterSnap, "validate_config")
+    config = {}
+    exporter_ = exporter.ExporterSnap()
+
+    mock_validate.side_effect = exporter.ExporterConfigError
+    with patch("builtins.open", new_callable=mock_open):
+        with pytest.raises(exporter.ExporterConfigError):
             exporter_.apply_config(config)
 
-            mock_stop.assert_called_once_with()
-            mock_validate.assert_called_once_with(config)
-            mock_dump.assert_called_once_with(config, ANY)
-            file_.assert_called_once_with(exporter_.SNAP_CONFIG_PATH, "w", encoding="utf-8")
-            mock_start.assert_called_once_with()
+    mock_stop.assert_called_once_with()
+    mock_validate.assert_called_once_with(config)
+    mock_dump.assert_not_called()
+    mock_start.assert_not_called()
 
 
 @pytest.mark.parametrize(
