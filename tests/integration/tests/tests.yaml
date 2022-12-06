@@ -1,5 +1,8 @@
+charm_name: prometheus-juju-exporter
+
 gate_bundles:
   - jammy
+  - focal
 
 tests:
   - tests.test_charm.BasicPrometheusJujuExporterTests
