@@ -61,7 +61,7 @@ def test_snap_path_property(resource_exists, resource_size, is_path_expected, ha
     assert harness.charm.snap_path == expected_path
 
 
-def test_get_controller_ca_from_file_success(harness, mocker):
+def test_get_controller_ca_cert_from_file_success(harness, mocker):
     """Test successfully parsing CA cert data out of an agent.conf file."""
     charm_path = "/var/lib/juju/agents/unit-0/charm/"
     agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
@@ -71,13 +71,13 @@ def test_get_controller_ca_from_file_success(harness, mocker):
 
     with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
         expected_ca_cert = agent_conf_data["cacert"]
-        ca_cert = harness.charm.get_controller_ca()
+        ca_cert = harness.charm.get_controller_ca_cert()
         assert ca_cert == expected_ca_cert
 
     open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
 
 
-def test_get_controller_ca_from_file_fail(harness, mocker):
+def test_get_controller_ca_cert_from_file_fail(harness, mocker):
     """Test failure when CA cert can't be parsed out of an agent.conf file."""
     charm_path = "/var/lib/juju/agents/unit-0/charm/"
     agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
@@ -87,29 +87,29 @@ def test_get_controller_ca_from_file_fail(harness, mocker):
 
     with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
         with pytest.raises(RuntimeError):
-            harness.charm.get_controller_ca()
+            harness.charm.get_controller_ca_cert()
 
     open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
 
 
-def test_get_controller_ca_from_config_success(harness):
+def test_get_controller_ca_cert_from_config_success(harness):
     """Test successfully parsing CA certificate from config option."""
     ca_data = "VGhpcyBpcyB2YWxpZCBDQQ=="
     with harness.hooks_disabled():
-        harness.update_config({"controller-ca": ca_data})
+        harness.update_config({"controller-ca-cert": ca_data})
 
     expected_data = b64decode(ca_data).decode(encoding="ascii")
-    assert expected_data == harness.charm.get_controller_ca()
+    assert expected_data == harness.charm.get_controller_ca_cert()
 
 
-def test_get_controller_ca_from_config_fail(harness):
+def test_get_controller_ca_cert_from_config_fail(harness):
     """Test failure when parsing CA certificate from config option."""
     ca_data = "this_is-not valid b64"
     with harness.hooks_disabled():
-        harness.update_config({"controller-ca": ca_data})
+        harness.update_config({"controller-ca-cert": ca_data})
 
     with pytest.raises(RuntimeError):
-        harness.charm.get_controller_ca()
+        harness.charm.get_controller_ca_cert()
 
 
 def test_generate_exporter_config_complete(harness, mocker):
@@ -122,7 +122,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     user = "foo"
     password = "bar"
     interval = 5
-    mocker.patch.object(harness.charm, "get_controller_ca", return_value=ca_cert)
+    mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value=ca_cert)
 
     expected_snap_config = {
         "customer": {
@@ -163,7 +163,7 @@ def test_generate_exporter_config_incomplete(harness, mocker):
     """Test that generated config will have 'None' values for missing config options."""
     expected_missing_config = {"juju": ["controller_endpoint", "username", "password"]}
     expected_present_config = {"exporter": ["collect_interval", "port"]}
-    mocker.patch.object(harness.charm, "get_controller_ca", return_value="ca")
+    mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value="ca")
 
     with harness.hooks_disabled():
         harness.update_config(

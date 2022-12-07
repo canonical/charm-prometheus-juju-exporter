@@ -86,24 +86,24 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         return self._snap_path
 
-    def get_controller_ca(self) -> str:
+    def get_controller_ca_cert(self) -> str:
         """Get CA certificate used by targeted Juju controller.
 
-        CA certificate can be directly configured by `controller-ca` option, if it is, the value is
-        directly returned by this method. If it is not defined, a CA cert used by the controller
-        that deploys this unit will be returned.
+        CA certificate can be directly configured by `controller-ca-cert` option, if it is, the
+        value is directly returned by this method. If it is not defined, a CA cert used by the
+        controller that deploys this unit will be returned.
         """
-        explicit_cert = self.config.get("controller-ca", "")
+        explicit_cert = self.config.get("controller-ca-cert", "")
         if explicit_cert:
             try:
                 return b64decode(explicit_cert, validate=True).decode(encoding="ascii")
             except Base64Error as exc:
                 logger.error(
-                    "Config option 'controller-ca' does not contain valid base64-encoded data."
-                    " Bad data: %s",
+                    "Config option 'controller-ca-cert' does not contain valid base64-encoded"
+                    " data. Bad data: %s",
                     explicit_cert,
                 )
-                raise RuntimeError("Invalid base64 value in 'controller-ca' option.") from exc
+                raise RuntimeError("Invalid base64 value in 'controller-ca-cert' option.") from exc
 
         agent_conf_path = pathlib.Path(hookenv.charm_dir()).joinpath("../agent.conf")
         with open(agent_conf_path, "r", encoding="utf-8") as conf_file:
@@ -121,7 +121,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             customer=self.config.get("customer"),
             cloud=self.config.get("cloud-name"),
             controller=self.config.get("controller-url"),
-            ca_cert=self.get_controller_ca(),
+            ca_cert=self.get_controller_ca_cert(),
             user=self.config.get("juju-user"),
             password=self.config.get("juju-password"),
             interval=self.config.get("scrape-interval"),
