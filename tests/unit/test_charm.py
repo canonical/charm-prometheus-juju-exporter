@@ -36,14 +36,14 @@ def test_charm_event_mapping(event_name, handler, harness, mocker):
 
 
 @pytest.mark.parametrize(
-    "resource_exists, resource_size, expect_path",
+    "resource_exists, resource_size, is_path_expected",
     [
         (False, 0, False),  # In case resource was not attached, return None
         (True, 0, False),  # In case the attached resource is empty file, return None
         (True, 10, True),  # If resource is attached and has size, return local path
     ],
 )
-def test_snap_path_property(resource_exists, resource_size, expect_path, harness):
+def test_snap_path_property(resource_exists, resource_size, is_path_expected, harness):
     """Test that 'snap_path' property returns file path only when real resource is attached.
 
     If resource is not attached or if it's an empty file, this property should return None.
@@ -54,7 +54,9 @@ def test_snap_path_property(resource_exists, resource_size, expect_path, harness
         snap_data = "".join(list(repeat("0", resource_size)))
         harness.add_resource(snap_name, snap_data)
 
-    expected_path = str(harness.charm.model.resources.fetch(snap_name)) if expect_path else None
+    expected_path = (
+        str(harness.charm.model.resources.fetch(snap_name)) if is_path_expected else None
+    )
 
     assert harness.charm.snap_path == expected_path
 
@@ -220,8 +222,7 @@ def test_reconfigure_scrape_target_fail(harness, mocker):
         harness.charm.reconfigure_scrape_target()
 
     logger_mock.error.assert_called_once_with(
-        "Failed to configure prometheus scrape target: %s",
-        exception
+        "Failed to configure prometheus scrape target: %s", exception
     )
 
 
@@ -244,20 +245,23 @@ def test_reconfigure_open_ports(harness, mocker):
     mock_open_port.assert_called_once_with(new_port)
 
 
-@pytest.mark.parametrize("error", [True, False])
-def test_on_install_callback(error, harness, mocker):
+def test_on_install_callback_success(harness, mocker):
     """Test handling of InstallEvent with '_on_install' callback."""
+    exporter_install = mocker.patch.object(harness.charm.exporter, "install")
+
+    harness.charm._on_install(None)
+    exporter_install.assert_called_once_with(harness.charm.snap_path)
+    assert isinstance(harness.charm.unit.status, charm.MaintenanceStatus)
+
+
+def test_on_install_callback_fail(harness, mocker):
+    """Test handling of error during InstallEvent."""
     snap_exception = charm.snap.CouldNotAcquireLockException
     exporter_install = mocker.patch.object(harness.charm.exporter, "install")
 
-    if error:
-        exporter_install.side_effect = snap_exception
-        with pytest.raises(snap_exception):
-            harness.charm._on_install(None)
-    else:
+    exporter_install.side_effect = snap_exception
+    with pytest.raises(snap_exception):
         harness.charm._on_install(None)
-        exporter_install.assert_called_once_with(harness.charm.snap_path)
-        assert isinstance(harness.charm.unit.status, charm.MaintenanceStatus)
 
 
 def test_on_config_changed_incomplete(harness, mocker):
