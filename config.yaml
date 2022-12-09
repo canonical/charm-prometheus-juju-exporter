@@ -5,10 +5,49 @@
 
 options:
   # An example config option to customise the log level of the workload
-  log-level:
+  customer:
     description: |
-      Configures the log level of gunicorn. 
-
-      Acceptable values are: "info", "debug", "warning", "error" and "critical"
-    default: "info"
+      Name of the customer that will be added as label to collected metrics. It's useful when
+      Prometheus collects metrics from multiple organizations/customers.
+    default: ""
     type: string
+  cloud-name:
+    description: |
+      Arbitrary name for a cloud/deployment. This name will be added as label to collected
+      metrics. It's useful when Prometheus collects metrics from multiple controllers.
+    default: ""
+    type: string
+  controller-url:
+    description: Endpoint of a juju controller in format <IP>:<PORT>
+    default: ""
+    type: string
+  controller-ca-cert:
+    description: |
+      This option is necessary only if if this exporter targets external controller (i.e.
+      different controller than one deploying this charm). It should contain `base64` encoded
+      CA certificate of the targeted juju controller.
+    default: ""
+    type: string
+  juju-user:
+    description: Username that will be used to log into juju controller
+    default: ""
+    type: string
+  juju-password:
+    description: Password for juju user
+    default: ""
+    type: string
+  scrape-port:
+    description: Port to which prometheus exporter is bound.
+    default: 5000
+    type: int
+  scrape-interval:
+    description: |
+      This option dictates how often exporter updates its data and how often should Prometheus
+      scrape them.(In minutes)
+    default: 15
+    type: int
+  scrape-timeout:
+    description: |
+      How long should Prometheus wait for response to scrape request before timing out (In seconds)
+    default: 30
+    type: int
