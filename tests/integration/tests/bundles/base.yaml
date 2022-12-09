@@ -1,0 +1,16 @@
+applications:
+  ubuntu:
+    charm: ch:ubuntu
+    num_units: 1
+
+  juju-local:
+    charm: bootstack-charmers-juju-local
+    num_units: 0
+
+  prometheus:
+    charm: ch:prometheus2
+    num_units: 1
+
+relations:
+  - - "ubuntu"
+    - "juju-local"

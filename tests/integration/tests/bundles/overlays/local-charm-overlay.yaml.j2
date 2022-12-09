@@ -1,0 +1,12 @@
+applications:
+  {{ charm_name }}:
+    charm: "{{ CHARM_LOCATION }}/{{ charm_name }}.charm"
+    num_units: 0
+    resources:
+      exporter-snap: "{{ CHARM_LOCATION }}/exporter.snap"
+
+relations:
+  - - "ubuntu"
+    - {{ charm_name }}
+  - - "prometheus"
+    - {{ charm_name }}
