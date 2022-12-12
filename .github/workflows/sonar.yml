@@ -22,7 +22,7 @@ jobs:
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
-        run: make unittest
+        run: make unittests
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
