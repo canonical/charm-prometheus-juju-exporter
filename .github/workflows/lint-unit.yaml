@@ -3,10 +3,11 @@ name: Linting and Unit Tests
 on:
   push:
     branches:
-      - ci
+      - main
   pull_request:
     types: [ opened, synchronize, reopened ]
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   lint-unit:
@@ -27,8 +28,24 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox
+        python -m pip install "tox < 4" #tox has breaking changes in major version 4
     - name: Run lint checkers
       run: tox -e lint
     - name: Run unit tests
       run: tox -e unit
+    - name: Save PR number to file
+      run: echo ${{ github.event.number }} > PR_NUMBER.txt
+    - name: Archive PR number
+      uses: actions/upload-artifact@v3
+      with:
+        name: PR_NUMBER
+        path: PR_NUMBER.txt
+    - name: Save coverage report
+      run: |
+        report_root="/home/runner/work/charm-prometheus-juju-exporter/prometheus-juju-exporter/tests/unit/report/"
+        cp ${report_root}/coverage.xml cov.xml
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: ./cov.xml
