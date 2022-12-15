@@ -46,3 +46,17 @@ ignore_missing_imports = true
 module = [
   "charmhelpers.*"
 ]
+
+[tool.coverage.run]
+relative_files = true
+source = ["src/"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+
+[tool.coverage.html]
+directory = "tests/unit/report/html"
+
+[tool.coverage.xml]
+output = "tests/unit/report/coverage.xml"
