@@ -42,7 +42,7 @@ jobs:
         path: PR_NUMBER.txt
     - name: Save coverage report
       run: |
-        report_root="/home/runner/work/charm-prometheus-juju-exporter/prometheus-juju-exporter/tests/unit/report/"
+        report_root="/home/runner/work/charm-prometheus-juju-exporter/charm-prometheus-juju-exporter/tests/unit/report/"
         cp ${report_root}/coverage.xml cov.xml
     - name: Archive code coverage results
       uses: actions/upload-artifact@v3
