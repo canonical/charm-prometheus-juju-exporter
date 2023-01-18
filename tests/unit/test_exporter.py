@@ -91,6 +91,9 @@ def test_validate_config():
             "username": "foo",
             "password": "bar",
         },
+        "machine": {
+            "virt_macs": "FFF:FFF:FFF",
+        },
     }
 
     exporter_ = exporter.ExporterSnap()
@@ -174,7 +177,7 @@ def test_execute_service_action(mocker):
     mock_call.assert_called_once_with(expected_command)
 
 
-def test_execute_service_action_unknownw(mocker):
+def test_execute_service_action_unknown(mocker):
     """Test that '_execute_service_action' raises error if it does not recognize the action."""
     mock_call = mocker.patch.object(exporter.subprocess, "call")
     bad_action = "foo"

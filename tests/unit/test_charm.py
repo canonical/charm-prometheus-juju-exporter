@@ -122,6 +122,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     user = "foo"
     password = "bar"
     interval = 5
+    prefixes = "TTT:TTT:TTT,FFF:FFF:FFF"
     mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value=ca_cert)
 
     expected_snap_config = {
@@ -139,6 +140,9 @@ def test_generate_exporter_config_complete(harness, mocker):
             "username": user,
             "controller_cacert": ca_cert,
         },
+        "machine": {
+            "virt_macs": prefixes,
+        },
     }
 
     with harness.hooks_disabled():
@@ -151,6 +155,7 @@ def test_generate_exporter_config_complete(harness, mocker):
                 "juju-password": password,
                 "scrape-interval": interval,
                 "scrape-port": port,
+                "virtual-macs": prefixes,
             }
         )
 
@@ -173,6 +178,7 @@ def test_generate_exporter_config_incomplete(harness, mocker):
                 "juju-password": "",
                 "scrape-interval": 5,
                 "scrape-port": 5000,
+                "virtual-macs": "FFF:FFF:FFF"
             }
         )
 

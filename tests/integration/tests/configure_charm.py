@@ -63,10 +63,11 @@ def setup_juju_credentials() -> None:
             "customer": "Test org",
             "cloud-name": "Test Cloud",
             "controller-url": endpoint,
-            "controller-ca": b64encode(ca_cert.encode()).decode(encoding="ascii"),
+            "controller-ca-cert": b64encode(ca_cert.encode()).decode(encoding="ascii"),
             "juju-user": username,
             "juju-password": password,
             "scrape-interval": "1",
+            "virtual-macs": "BAD:BAD:BAD,FFF:FFF:FFF",
         },
     )
 
