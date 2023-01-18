@@ -178,7 +178,7 @@ def test_generate_exporter_config_incomplete(harness, mocker):
                 "juju-password": "",
                 "scrape-interval": 5,
                 "scrape-port": 5000,
-                "virtual-macs": "FFF:FFF:FFF"
+                "virtual-macs": "FFF:FFF:FFF",
             }
         )
 
