@@ -14,10 +14,8 @@ import exporter
 def validate_config_error(config: Dict, expected_error: str):
     """Run config validation and verify that expected error is present in the raised exception."""
     exporter_ = exporter.ExporterSnap()
-    with pytest.raises(exporter.ExporterConfigError) as exc:
+    with pytest.raises(exporter.ExporterConfigError, match=expected_error):
         exporter_.validate_config(config)
-
-    assert expected_error in str(exc)
 
 
 @pytest.mark.parametrize("local_snap", [True, False])
