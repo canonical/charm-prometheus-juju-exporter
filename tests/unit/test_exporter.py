@@ -91,7 +91,7 @@ def test_validate_config():
             "username": "foo",
             "password": "bar",
         },
-        "machine": {
+        "detection": {
             "virt_macs": "FFF:FFF:FFF",
         },
     }

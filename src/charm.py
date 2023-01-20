@@ -49,7 +49,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         "juju-password": "juju.password",
         "scrape-interval": "exporter.collect_interval",
         "scrape-port": "exporter.port",
-        "virtual-macs": "machine.virt_macs",
+        "virtual-macs": "detection.virt_macs",
     }
 
     def __init__(self, *args: Any) -> None:
@@ -127,7 +127,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             password=self.config.get("juju-password"),
             interval=self.config.get("scrape-interval"),
             port=self.config.get("scrape-port"),
-            prefixes=self.config.get("virtual-macs"),
+            prefixes=self.config.get("virtual-macs").split(","),
         )
 
         return config.render()

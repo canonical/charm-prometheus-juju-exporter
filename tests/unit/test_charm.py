@@ -140,8 +140,8 @@ def test_generate_exporter_config_complete(harness, mocker):
             "username": user,
             "controller_cacert": ca_cert,
         },
-        "machine": {
-            "virt_macs": prefixes,
+        "detection": {
+            "virt_macs": prefixes.split(","),
         },
     }
 

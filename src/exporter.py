@@ -33,7 +33,7 @@ class ExporterConfig(NamedTuple):
     password: Optional[str] = None
     interval: Optional[str] = None
     port: Optional[str] = None
-    prefixes: Optional[str] = None
+    prefixes: Optional[list] = None
 
     def render(self) -> Dict[str, Dict[str, Optional[str]]]:
         """Return dict that can be written to an exporter config file as a yaml."""
@@ -52,7 +52,7 @@ class ExporterConfig(NamedTuple):
                 "collect_interval": self.interval,
                 "port": self.port,
             },
-            "machine": {
+            "detection": {
                 "virt_macs": self.prefixes,
             },
         }
@@ -77,7 +77,7 @@ class ExporterSnap:
         "juju.password",
         "exporter.port",
         "exporter.collect_interval",
-        "machine.virt_macs",
+        "detection.virt_macs",
     ]
 
     def install(self, snap_path: Optional[str] = None) -> None:
