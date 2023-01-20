@@ -17,7 +17,7 @@ import os
 import pathlib
 from base64 import b64decode
 from binascii import Error as Base64Error
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from charmhelpers.core import hookenv
@@ -116,7 +116,7 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         return ca_cert
 
-    def generate_exporter_config(self) -> Dict[str, Dict[str, Optional[str]]]:
+    def generate_exporter_config(self) -> Dict[str, Dict[str, Union[List[str], str, None]]]:
         """Generate exporter service config based on the values from charm config."""
         config = ExporterConfig(
             customer=self.config.get("customer"),
@@ -127,7 +127,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             password=self.config.get("juju-password"),
             interval=self.config.get("scrape-interval"),
             port=self.config.get("scrape-port"),
-            prefixes=self.config.get("virtual-macs").split(","),
+            prefixes=self.config.get("virtual-macs"),
         )
 
         return config.render()
