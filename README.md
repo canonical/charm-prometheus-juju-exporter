@@ -58,7 +58,12 @@ that the charm unit itself has very little information about the cloud/model/con
 deployed in. On its own, it's not capable of performing any introspection. That's why we need
 the credentials, to connect to the controller as a regular juju client. You can create separate
 Juju account for this purpose or in the development environments, you can reuse your own
-user/password (usually found in `~/.local/share/juju/accounts.yaml`).
+user/password (usually found in `~/.local/share/juju/accounts.yaml`). 
+
+**Note:** Normally, **`superuser`** privilege is expected for such a user for full access to 
+the controller. However, in case it is not possible, the minimum privilege requirements are:
+1. `login` access to the controller instance and `admin` access to the model hosting the controller
+2. `admin` access to any model that's expected to be monitored by this exporter
 
 Required options:
 
