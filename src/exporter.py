@@ -9,7 +9,7 @@ Module focused on handling operations related to prometheus-juju-exporter snap.
 import logging
 import os
 import subprocess
-from typing import Any, Dict, List, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 import yaml
 from charmhelpers.fetch import snap
@@ -33,8 +33,9 @@ class ExporterConfig(NamedTuple):
     password: Optional[str] = None
     interval: Optional[str] = None
     port: Optional[str] = None
+    prefixes: Optional[str] = None
 
-    def render(self) -> Dict[str, Dict[str, Optional[str]]]:
+    def render(self) -> Dict[str, Dict[str, Union[List[str], str, None]]]:
         """Return dict that can be written to an exporter config file as a yaml."""
         return {
             "customer": {
@@ -50,6 +51,9 @@ class ExporterConfig(NamedTuple):
             "exporter": {
                 "collect_interval": self.interval,
                 "port": self.port,
+            },
+            "detection": {
+                "virt_macs": self.prefixes.split(",") if self.prefixes else self.prefixes,
             },
         }
 
@@ -73,6 +77,7 @@ class ExporterSnap:
         "juju.password",
         "exporter.port",
         "exporter.collect_interval",
+        "detection.virt_macs",
     ]
 
     def install(self, snap_path: Optional[str] = None) -> None:

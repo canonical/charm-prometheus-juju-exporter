@@ -51,3 +51,11 @@ options:
       How long should Prometheus wait for response to scrape request before timing out (In seconds)
     default: 30
     type: int
+  virtual-macs:
+    description: |
+      The list of MAC address prefixes to be considered as virtual machines.
+      The default value contains some of the most common MAC prefixes seen in
+      virtual environment (QEMU, Microsoft, and VMWare).
+      This configuration accepts comma-separated MAC prefixes in string format.
+    default: "52:54:00,fa:16:3e,06:f1:3a,00:0d:3a,00:50:56"
+    type: string

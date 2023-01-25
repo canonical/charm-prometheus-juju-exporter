@@ -14,10 +14,8 @@ import exporter
 def validate_config_error(config: Dict, expected_error: str):
     """Run config validation and verify that expected error is present in the raised exception."""
     exporter_ = exporter.ExporterSnap()
-    with pytest.raises(exporter.ExporterConfigError) as exc:
+    with pytest.raises(exporter.ExporterConfigError, match=expected_error):
         exporter_.validate_config(config)
-
-    assert expected_error in str(exc)
 
 
 @pytest.mark.parametrize("local_snap", [True, False])
@@ -90,6 +88,9 @@ def test_validate_config():
             "controller_cacert": "CA CERT DATA",
             "username": "foo",
             "password": "bar",
+        },
+        "detection": {
+            "virt_macs": "FFF:FFF:FFF",
         },
     }
 
@@ -174,7 +175,7 @@ def test_execute_service_action(mocker):
     mock_call.assert_called_once_with(expected_command)
 
 
-def test_execute_service_action_unknownw(mocker):
+def test_execute_service_action_unknown(mocker):
     """Test that '_execute_service_action' raises error if it does not recognize the action."""
     mock_call = mocker.patch.object(exporter.subprocess, "call")
     bad_action = "foo"
