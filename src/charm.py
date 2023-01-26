@@ -17,12 +17,13 @@ import os
 import pathlib
 from base64 import b64decode
 from binascii import Error as Base64Error
-from typing import Any, Dict, List, Optional, Union
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import yaml
 from charmhelpers.core import hookenv
 from charmhelpers.fetch import snap
-from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent
+from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent, UpdateStatusEvent
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, ModelError
 from prometheus_interface.operator import (
@@ -35,6 +36,30 @@ from exporter import ExporterConfig, ExporterConfigError, ExporterSnap
 
 # Log messages can be retrieved using juju debug-log
 logger = logging.getLogger(__name__)
+
+
+def evaluate_status(func: Callable) -> Callable:
+    """Decorate `PrometheusJujuExporterCharm` method to perform status evaluation.
+
+    This wrapper can be used to decorate a method (primarily an event handler) from
+    `PrometheusJujuExporterCharm` class. When decorated function is executed, this
+    wrapper will perform final assessment of unit's state and sets unit status.
+    """
+
+    @wraps(func)
+    def wrapper(self: "PrometheusJujuExporterCharm", *args: Any, **kwargs: Any) -> Any:
+        """Execute wrapped method and perform status assessment."""
+        result = func(self, *args, **kwargs)
+
+        exporter_running = self.exporter.running()
+        if isinstance(self.unit.status, ActiveStatus) and not exporter_running:
+            self.unit.status = BlockedStatus("Exporter service is inactive.")
+        elif not isinstance(self.unit.status, ActiveStatus) and exporter_running:
+            self.unit.status = ActiveStatus("Unit is ready")
+
+        return result
+
+    return wrapper
 
 
 class PrometheusJujuExporterCharm(CharmBase):
@@ -62,6 +87,7 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
+        self.framework.observe(self.on.update_status, self._on_update_status)
         self.framework.observe(
             self.prometheus_target.on.prometheus_available, self._on_prometheus_available
         )
@@ -172,6 +198,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             logger.error("Failed to install %s from %s.", self.exporter.SNAP_NAME, install_source)
             raise exc
 
+    @evaluate_status
     def _on_config_changed(self, _: ConfigChangedEvent) -> None:
         """Handle changed configuration."""
         logger.info("Processing new charm configuration.")
@@ -190,11 +217,14 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         self.reconfigure_scrape_target()
         self.reconfigure_open_ports()
-        self.unit.status = ActiveStatus("Unit is ready")
 
     def _on_prometheus_available(self, _: PrometheusConnected) -> None:
         """Trigger configuration of a prometheus scrape target."""
         self.reconfigure_scrape_target()
+
+    @evaluate_status
+    def _on_update_status(self, _: UpdateStatusEvent) -> None:
+        """Asses unit's status."""
 
 
 if __name__ == "__main__":  # pragma: nocover

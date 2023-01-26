@@ -185,3 +185,21 @@ def test_execute_service_action_unknown(mocker):
         exporter_._execute_service_action(bad_action)
 
     mock_call.assert_not_called()
+
+
+def test_service_name():
+    """Test that `service_name` property returns expected value."""
+    exporter_ = exporter.ExporterSnap()
+    expected_service = f"snap.{exporter_.SNAP_NAME}.{exporter_.SNAP_NAME}.service"
+
+    assert exporter_.service_name == expected_service
+
+
+@pytest.mark.parametrize("running", [True, False])
+def test_exporter_service_running(running, mocker):
+    """Test that `running` method returns True/False based on if service is running."""
+    mocker.patch.object(exporter.ch_host, "service_running", return_value=running)
+
+    exporter_ = exporter.ExporterSnap()
+
+    assert exporter_.running() == running
