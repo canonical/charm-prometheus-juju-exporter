@@ -189,7 +189,7 @@ class ExporterSnap:
         """Start exporter service."""
         self._execute_service_action("start")
 
-    def running(self) -> bool:
+    def is_running(self) -> bool:
         """Check if exporter service is running."""
         return ch_host.service_running(self.service_name)
 

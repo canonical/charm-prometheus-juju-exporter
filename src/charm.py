@@ -51,9 +51,11 @@ def evaluate_status(func: Callable) -> Callable:
         """Execute wrapped method and perform status assessment."""
         result = func(self, *args, **kwargs)
 
-        exporter_running = self.exporter.running()
+        exporter_running = self.exporter.is_running()
         if isinstance(self.unit.status, ActiveStatus) and not exporter_running:
-            self.unit.status = BlockedStatus("Exporter service is inactive.")
+            self.unit.status = BlockedStatus(
+                "Exporter service is inactive. (See service logs in unit.)"
+            )
         elif not isinstance(self.unit.status, ActiveStatus) and exporter_running:
             self.unit.status = ActiveStatus("Unit is ready")
 
@@ -224,7 +226,7 @@ class PrometheusJujuExporterCharm(CharmBase):
 
     @evaluate_status
     def _on_update_status(self, _: UpdateStatusEvent) -> None:
-        """Asses unit's status."""
+        """Assess unit's status."""
 
 
 if __name__ == "__main__":  # pragma: nocover

@@ -290,7 +290,7 @@ def test_on_config_changed_success(mocker, harness):
     """Test successful application of new config values."""
     valid_config = {"valid": "config"}
     mocker.patch.object(harness.charm, "generate_exporter_config", return_value=valid_config)
-    mocker.patch.object(exporter.ExporterSnap, "running", return_value=True)
+    mocker.patch.object(exporter.ExporterSnap, "is_running", return_value=True)
     mock_apply_config = mocker.patch.object(harness.charm.exporter, "apply_config")
     mock_reconfigure_scrape = mocker.patch.object(harness.charm, "reconfigure_scrape_target")
     mock_reconfigure_ports = mocker.patch.object(harness.charm, "reconfigure_open_ports")
@@ -332,7 +332,7 @@ def test_evaluate_status(current_status, service_running, expected_status, harne
     Blocked             Yes                     Active
     Blocked             No                      Blocked
     """
-    mocker.patch.object(exporter.ExporterSnap, "running", return_value=service_running)
+    mocker.patch.object(exporter.ExporterSnap, "is_running", return_value=service_running)
     harness.charm.unit.status = current_status("Initial status")
 
     # trigger actual status evaluation wrapper via update-status event

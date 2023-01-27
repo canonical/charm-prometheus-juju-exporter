@@ -197,9 +197,12 @@ def test_service_name():
 
 @pytest.mark.parametrize("running", [True, False])
 def test_exporter_service_running(running, mocker):
-    """Test that `running` method returns True/False based on if service is running."""
-    mocker.patch.object(exporter.ch_host, "service_running", return_value=running)
+    """Test that `is_running` method returns True/False based on service status."""
+    mock_service_running = mocker.patch.object(
+        exporter.ch_host, "service_running", return_value=running
+    )
 
     exporter_ = exporter.ExporterSnap()
 
-    assert exporter_.running() == running
+    assert exporter_.is_running() == running
+    mock_service_running.assert_called_once_with(exporter_.service_name)
