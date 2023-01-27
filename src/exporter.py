@@ -12,6 +12,7 @@ import subprocess
 from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 import yaml
+from charmhelpers.core import host as ch_host
 from charmhelpers.fetch import snap
 
 # Log messages can be retrieved using juju debug-log
@@ -79,6 +80,11 @@ class ExporterSnap:
         "exporter.collect_interval",
         "detection.virt_macs",
     ]
+
+    @property
+    def service_name(self) -> str:
+        """Return name of the exporter's systemd service."""
+        return f"snap.{self.SNAP_NAME}.{self.SNAP_NAME}.service"
 
     def install(self, snap_path: Optional[str] = None) -> None:
         """Install prometheus-juju-exporter snap.
@@ -182,6 +188,10 @@ class ExporterSnap:
     def start(self) -> None:
         """Start exporter service."""
         self._execute_service_action("start")
+
+    def is_running(self) -> bool:
+        """Check if exporter service is running."""
+        return ch_host.service_running(self.service_name)
 
     def _execute_service_action(self, action: str) -> None:
         """Execute one of the supported snap service actions.
