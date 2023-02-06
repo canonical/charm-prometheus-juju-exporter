@@ -50,9 +50,16 @@ module = [
   "charmhelpers.*"
 ]
 
+[tool.pytest.ini_options]
+addopts = '''
+    --last-failed
+    --last-failed-no-failures all
+'''
+
 [tool.coverage.run]
 relative_files = true
-source = ["src/"]
+source = ["src"]
+omit = ["tests/**", "docs/**", "templates/**"]
 
 [tool.coverage.report]
 fail_under = 100

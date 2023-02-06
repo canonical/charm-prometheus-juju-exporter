@@ -58,9 +58,9 @@ that the charm unit itself has very little information about the cloud/model/con
 deployed in. On its own, it's not capable of performing any introspection. That's why we need
 the credentials, to connect to the controller as a regular juju client. You can create separate
 Juju account for this purpose or in the development environments, you can reuse your own
-user/password (usually found in `~/.local/share/juju/accounts.yaml`). 
+user/password (usually found in `~/.local/share/juju/accounts.yaml`).
 
-**Note:** Normally, **`superuser`** privilege is expected for such a user for full access to 
+**Note:** Normally, **`superuser`** privilege is expected for such a user for full access to
 the controller. However, in case it is not possible, the minimum privilege requirements are:
 1. `login` access to the controller instance and `admin` access to the model hosting the controller
 2. `admin` access to any model that's expected to be monitored by this exporter
@@ -90,7 +90,7 @@ cd prometheus-juju-exporter/
 make build
 ```
 
-### Step 1 - Clone and build the charm 
+### Step 1 - Clone and build the charm
 Clone this repository (if you haven't already) and run `make build`.
 
 ```bash
@@ -137,12 +137,12 @@ App                       Version  Status  Scale  Charm                     Chan
 grafana                            active      1  grafana                   stable    59  no       Ready
 prometheus-juju-exporter           active      1  prometheus-juju-exporter             0  no       Unit is ready
 prometheus2                        active      1  prometheus2               stable    33  no       Ready
-ubuntu                    20.04    active      1  ubuntu                    stable    21  no       
+ubuntu                    20.04    active      1  ubuntu                    stable    21  no
 
 Unit                           Workload  Agent  Machine  Public address  Ports               Message
 grafana/0*                     active    idle   2        10.75.224.197   3000/tcp            Ready
 prometheus2/0*                 active    idle   1        10.75.224.118   9090/tcp,12321/tcp  Ready
-ubuntu/0*                      active    idle   0        10.75.224.13                        
+ubuntu/0*                      active    idle   0        10.75.224.13
   prometheus-juju-exporter/0*  active    idle            10.75.224.13    5000/tcp            Unit is ready
 
 ```
