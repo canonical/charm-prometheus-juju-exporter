@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import yaml
 from charmhelpers.core import hookenv
 from charmhelpers.fetch import snap
+from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent, UpdateStatusEvent
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, ModelError
@@ -92,6 +93,15 @@ class PrometheusJujuExporterCharm(CharmBase):
         self.framework.observe(self.on.update_status, self._on_update_status)
         self.framework.observe(
             self.prometheus_target.on.prometheus_available, self._on_prometheus_available
+        )
+
+        self.metrics_endpoint = MetricsEndpointProvider(
+            self,
+            jobs=[
+                {
+                    "static_configs": [{"targets": ["*:5000"]}],
+                },
+            ],
         )
 
     @property

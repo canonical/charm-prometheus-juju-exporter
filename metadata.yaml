@@ -36,6 +36,8 @@ resources:
 provides:
   prometheus-scrape:
     interface: prometheus
+  metrics-endpoint: # For integration with prometheus-k8s
+    interface: prometheus_scrape
 
 requires:
   general-info:
