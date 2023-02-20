@@ -1,0 +1,8 @@
+alert: JujuMachinesUnstable
+expr: abs(sum(juju_machine_state) - sum(juju_machine_state offset 3m)) >= bool 0.33 * sum(juju_machine_state)
+for: 5m
+labels:
+  severity: warning
+annotations:
+  summary: "Number of juju machines highly unstable."
+  description: "The number of juju machines has been changing by over 33% compared to 3 minutes ago for over 5 minutes."
