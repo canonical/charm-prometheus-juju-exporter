@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import yaml
 from charmhelpers.core import hookenv
 from charmhelpers.fetch import snap
+from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent, UpdateStatusEvent
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, ModelError
@@ -83,7 +84,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Initialize charm."""
         super().__init__(*args)
         self.exporter = ExporterSnap()
-        self.prometheus_target = PrometheusScrapeTarget(self, "prometheus-scrape")
+        self.prometheus_target = PrometheusScrapeTarget(self, "prometheus-legacy-scrape")
         self._snap_path: Optional[str] = None
         self._snap_path_set = False
 
@@ -92,6 +93,17 @@ class PrometheusJujuExporterCharm(CharmBase):
         self.framework.observe(self.on.update_status, self._on_update_status)
         self.framework.observe(
             self.prometheus_target.on.prometheus_available, self._on_prometheus_available
+        )
+
+        port = self.config["scrape-port"]
+        self.metrics_endpoint = MetricsEndpointProvider(
+            self,
+            relation_name="prometheus-k8s-scrape",
+            jobs=[
+                {
+                    "static_configs": [{"targets": [f"*:{port}"]}],
+                },
+            ],
         )
 
     @property
@@ -164,7 +176,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Update scrape target configuration in related Prometheus application.
 
         Note: this function has no effect if there's no application related via
-        'prometheus-scrape'.
+        'prometheus-legacy-scrape'.
         """
         port = self.config["scrape-port"]
         interval_minutes = self.config["scrape-interval"]

@@ -34,8 +34,10 @@ resources:
     filename: prometheus-juju-exporter.snap
 
 provides:
-  prometheus-scrape:
+  prometheus-legacy-scrape:
     interface: prometheus
+  prometheus-k8s-scrape:
+    interface: prometheus_scrape
 
 requires:
   general-info:
