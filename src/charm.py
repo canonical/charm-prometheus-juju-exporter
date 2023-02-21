@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import yaml
 from charmhelpers.core import hookenv
 from charmhelpers.fetch import snap
+from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent, UpdateStatusEvent
 from ops.main import main
@@ -104,6 +105,9 @@ class PrometheusJujuExporterCharm(CharmBase):
                     "static_configs": [{"targets": [f"*:{port}"]}],
                 },
             ],
+        )
+        self.grafana_dashboard_provider = GrafanaDashboardProvider(
+            self, relation_name="grafana-k8s-dashboard"
         )
 
     @property
