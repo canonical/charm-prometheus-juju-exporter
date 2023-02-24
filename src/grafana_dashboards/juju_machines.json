@@ -205,7 +205,7 @@
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
-        "regex": "/.*/",
+        "regex": "/(kvm|lxd|.*metal)/",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
