@@ -1,0 +1,8 @@
+alert: JujuMachinesCountUnstable
+expr: abs((max(sum by (instance) (juju_machine_state{juju_application=~".*",juju_charm=~".*",juju_model=~".*",juju_model_uuid=~".*"}))) - (max(sum by (instance) (juju_machine_state{juju_application=~".*",juju_charm=~".*",juju_model=~".*",juju_model_uuid=~".*"} offset 1m)))) >= 0.33 * (max(sum by (instance) (juju_machine_state{juju_application=~".*",juju_charm=~".*",juju_model=~".*",juju_model_uuid=~".*"})))
+for: 5m
+labels:
+  severity: warning
+annotations:
+  summary: "Number of juju machines highly unstable."
+  description: "The number of juju machines has been changing by over 33% compared to 1 minute ago for over 5 minutes."

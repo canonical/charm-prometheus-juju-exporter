@@ -109,6 +109,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         self.grafana_dashboard_provider = GrafanaDashboardProvider(
             self, relation_name="grafana-k8s-dashboard"
         )
+        self.grafana_dashboard_provider._reinitialize_dashboard_data(inject_dropdowns=False)
 
     @property
     def snap_path(self) -> Optional[str]:
