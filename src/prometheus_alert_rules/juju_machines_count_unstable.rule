@@ -5,4 +5,4 @@ labels:
   severity: warning
 annotations:
   summary: "Number of juju machines highly unstable."
-  description: "The number of juju machines has been changing by over 33% compared to 1 minute ago for over 5 minutes."
+  description: "The number of juju machines has been changing by over 33% between scrapes for over 5 minutes."
