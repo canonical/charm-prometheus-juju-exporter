@@ -38,6 +38,8 @@ provides:
     interface: prometheus
   prometheus-k8s-scrape:
     interface: prometheus_scrape
+  grafana-k8s-dashboard:
+    interface: grafana_dashboard
 
 requires:
   general-info:
