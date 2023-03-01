@@ -1,3 +1,7 @@
+# This is a template `.gitignore` file for ops charms
+# This file is managed by bootstack-charms-spec and should not be modified
+# within individual charm repos. https://launchpad.net/bootstack-charms-spec
+
 # Juju files
 .unit-state.db
 

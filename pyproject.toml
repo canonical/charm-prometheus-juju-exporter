@@ -4,7 +4,7 @@
 
 [tool.flake8]
 ignore = ["D100", "D101", "D102", "D103", "W503", "W504"]
-exclude = ['.eggs', '.git', '.tox', '.venv', '.build', 'report', 'lib']
+exclude = ['.eggs', '.git', '.tox', '.venv', '.build', 'lib', 'report']
 max-line-length = 99
 max-complexity = 10
 
@@ -30,7 +30,7 @@ skip_glob = [
   ".tox",
   ".venv",
   ".build",
-  "lib/*",
+  "lib",
   "report"
 ]
 
@@ -50,15 +50,9 @@ module = [
   "charmhelpers.*"
 ]
 
-[tool.pytest.ini_options]
-addopts = '''
-    --last-failed
-    --last-failed-no-failures all
-'''
-
 [tool.coverage.run]
 relative_files = true
-source = ["src"]
+source = ["src", "lib"]
 omit = ["tests/**", "docs/**", "templates/**"]
 
 [tool.coverage.report]
