@@ -96,6 +96,8 @@ Clone this repository (if you haven't already) and run `make build`.
 ```bash
 git clone https://github.com/canonical/charm-prometheus-juju-exporter.git
 cd charm-prometheus-juju-exporter/
+git submodule init
+git submodule update
 make build
 ```
 ### Step 2 - Deploy charm with snap as a resource
