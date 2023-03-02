@@ -1,7 +1,7 @@
 name: SonarCloud
 on:
   workflow_run:
-    workflows: [Linting and Unit Tests]
+    workflows: [PR workflow running lint checkers, unit and functional tests]
     types: [completed]
 
 jobs:
