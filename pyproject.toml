@@ -52,7 +52,7 @@ module = [
 
 [tool.coverage.run]
 relative_files = true
-source = ["src", "lib"]
+source = ["src"]
 omit = ["tests/**", "docs/**", "templates/**"]
 
 [tool.coverage.report]
