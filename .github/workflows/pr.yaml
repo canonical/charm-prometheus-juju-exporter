@@ -21,3 +21,5 @@ jobs:
       python-version-unit: "['3.8', '3.10']"
       python-version-func: "3.10"
       tox-version: "<4"
+      provider: microstack
+
