@@ -59,3 +59,15 @@ options:
       This configuration accepts comma-separated MAC prefixes in string format.
     default: "52:54:00,fa:16:3e,06:f1:3a,00:0d:3a,00:50:56"
     type: string
+  skip-interfaces:
+    description: |
+      The list of interface names that should not be considered when detecting machine
+      type. This is useful, for example, when a machine is a KVM host (not guest) and it
+      has a bridge (e.g. "virbr0") with mac address matching one of the prefixes
+      in "virtual-macs" option. Such interface would then cause this machine to be mislabeled
+      as "KVM" type.
+      This configuration accepts comma-separated regular expressions in string format.
+      Any interface that matches any of these expressions will not be considered when
+      detecting machine type.
+    default: "^tap-,^vribr\\d*,^lxdbr\\d*,^docker\\d*,^fan-\\d*,^vnet\\d*,^vxlan,^genev,^(tun|tap|cali|veth)[a-f0-9]*"
+    type: string

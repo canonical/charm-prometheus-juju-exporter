@@ -89,9 +89,7 @@ def test_validate_config():
             "username": "foo",
             "password": "bar",
         },
-        "detection": {
-            "virt_macs": "FFF:FFF:FFF",
-        },
+        "detection": {"virt_macs": "FFF:FFF:FFF", "skip_interfaces": r"^virbr\d*,^tap-"},
     }
 
     exporter_ = exporter.ExporterSnap()
