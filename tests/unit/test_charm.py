@@ -22,6 +22,9 @@ import exporter
         ("on.config_changed", "_on_config_changed"),
         ("on.install", "_on_install"),
         ("prometheus_target.on.prometheus_available", "_on_prometheus_available"),
+        ("on.upgrade_charm", "_on_upgrade_charm"),
+        ("on.update_status", "_on_update_status"),
+        ("on.stop", "_on_stop"),
     ],
 )
 def test_charm_event_mapping(event_name, handler, harness, mocker):
@@ -260,6 +263,29 @@ def test_on_install_callback_success(harness, mocker):
     harness.charm._on_install(None)
     exporter_install.assert_called_once_with(harness.charm.snap_path)
     assert isinstance(harness.charm.unit.status, charm.MaintenanceStatus)
+
+
+def test_on_upgrade_charm(harness, mocker):
+    """Test event handler for charm upgrade.
+
+    This event should trigger re-installation of snap and re-rendering of snap config.
+    """
+    on_install_mock = mocker.patch.object(harness.charm, "_on_install")
+    on_config_mock = mocker.patch.object(harness.charm, "_on_config_changed")
+
+    harness.charm._on_upgrade_charm(None)
+
+    on_install_mock.assert_called_once_with(None)
+    on_config_mock.assert_called_once_with(None)
+
+
+def test_on_stop(harness, mocker):
+    """Test that charm cleans up exporter snap when it stops."""
+    uninstall_mock = mocker.patch.object(harness.charm.exporter, "uninstall")
+
+    harness.charm._on_stop(None)
+
+    uninstall_mock.assert_called_once()
 
 
 def test_on_install_callback_fail(harness, mocker):

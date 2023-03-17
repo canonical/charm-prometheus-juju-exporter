@@ -34,6 +34,16 @@ def test_exporter_snap_install(local_snap, mocker):
         mock_snap_install.assert_called_once_with(exporter_.SNAP_NAME)
 
 
+def test_exporter_snap_uninstall(mocker):
+    """Test uninstallation of exporter snap."""
+    snap_remove_mock = mocker.patch.object(exporter.snap, "snap_remove")
+
+    exporter_ = exporter.ExporterSnap()
+    exporter_.uninstall()
+
+    snap_remove_mock.assert_called_once_with(exporter_.SNAP_NAME)
+
+
 def test_validate_config_missing_fields():
     """Test config validation with all required fields missing."""
     missing_options = ", ".join(exporter.ExporterSnap._REQUIRED_CONFIG)

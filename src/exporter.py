@@ -103,6 +103,10 @@ class ExporterSnap:
             logger.info("Installing %s snap from snap store.", self.SNAP_NAME)
             snap.snap_install(self.SNAP_NAME)
 
+    def uninstall(self) -> None:
+        """Remove prometheus-juju-exporter snap."""
+        snap.snap_remove(self.SNAP_NAME)
+
     def _validate_required_options(self, config: Dict[str, Any]) -> List[str]:
         """Validate that config has all required options for snap to run."""
         missing_options = []

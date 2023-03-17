@@ -25,7 +25,14 @@ from charmhelpers.core import hookenv
 from charmhelpers.fetch import snap
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
-from ops.charm import CharmBase, ConfigChangedEvent, InstallEvent, UpdateStatusEvent
+from ops.charm import (
+    CharmBase,
+    ConfigChangedEvent,
+    InstallEvent,
+    StopEvent,
+    UpdateStatusEvent,
+    UpgradeCharmEvent,
+)
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, ModelError
 from prometheus_interface.operator import (
@@ -91,6 +98,8 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
+        self.framework.observe(self.on.stop, self._on_stop)
+        self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(self.on.update_status, self._on_update_status)
         self.framework.observe(
             self.prometheus_target.on.prometheus_available, self._on_prometheus_available
@@ -207,7 +216,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         logger.debug("Setting port %s as opened.", new_port)
         hookenv.open_port(new_port)
 
-    def _on_install(self, _: InstallEvent) -> None:
+    def _on_install(self, _: Optional[InstallEvent]) -> None:
         """Install prometheus-juju-exporter snap."""
         self.unit.status = MaintenanceStatus("Installing charm software.")
         try:
@@ -218,7 +227,21 @@ class PrometheusJujuExporterCharm(CharmBase):
             raise exc
 
     @evaluate_status
-    def _on_config_changed(self, _: ConfigChangedEvent) -> None:
+    def _on_upgrade_charm(self, _: UpgradeCharmEvent) -> None:
+        """Process charm upgrade event.
+
+        Since this event is triggered also when new resource is attached to the charm,
+        we must re-install the snap and re-apply configuration
+        """
+        self._on_install(None)
+        self._on_config_changed(None)
+
+    def _on_stop(self, _: StopEvent) -> None:
+        """Clean up exporter snap on charm's removal."""
+        self.exporter.uninstall()
+
+    @evaluate_status
+    def _on_config_changed(self, _: Optional[ConfigChangedEvent]) -> None:
         """Handle changed configuration."""
         logger.info("Processing new charm configuration.")
         exporter_config = self.generate_exporter_config()
