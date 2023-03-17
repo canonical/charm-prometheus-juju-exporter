@@ -78,6 +78,7 @@ class PrometheusJujuExporterCharm(CharmBase):
 
     # Mapping between charm and snap configuration options
     SNAP_CONFIG_MAP = {
+        "debug": "debug",
         "customer": "customer.name",
         "cloud-name": "customer.cloud_name",
         "controller-url": "juju.controller_endpoint",
@@ -171,9 +172,12 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         return ca_cert
 
-    def generate_exporter_config(self) -> Dict[str, Dict[str, Union[List[str], str, None]]]:
+    def generate_exporter_config(
+        self,
+    ) -> Dict[str, Union[Dict[str, Union[List[str], str, None]], str, None]]:
         """Generate exporter service config based on the values from charm config."""
         config = ExporterConfig(
+            debug=self.config.get("debug"),
             customer=self.config.get("customer"),
             cloud=self.config.get("cloud-name"),
             controller=self.config.get("controller-url"),

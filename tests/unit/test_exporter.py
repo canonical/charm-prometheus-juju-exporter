@@ -88,6 +88,7 @@ def test_validate_config_refresh_below_zero():
 def test_validate_config():
     """Test positively validating snap exporter config."""
     config = {
+        "debug": False,
         "customer": {"name": "Test Org", "cloud_name": "Test Cloud"},
         "exporter": {
             "port": 5000,
@@ -116,7 +117,7 @@ def test_validate_config():
 def test_apply_config_success(mocker):
     """Test successfully applying snap configuration."""
     mock_stop = mocker.patch.object(exporter.ExporterSnap, "stop")
-    mock_start = mocker.patch.object(exporter.ExporterSnap, "start")
+    mock_start = mocker.patch.object(exporter.ExporterSnap, "restart")
     mock_dump = mocker.patch.object(exporter.yaml, "safe_dump")
     mock_validate = mocker.patch.object(exporter.ExporterSnap, "validate_config")
     config = {"valid": "config"}
@@ -139,7 +140,7 @@ def test_apply_config_fail(mocker):
     and the service should remain stopped.
     """
     mock_stop = mocker.patch.object(exporter.ExporterSnap, "stop")
-    mock_start = mocker.patch.object(exporter.ExporterSnap, "start")
+    mock_start = mocker.patch.object(exporter.ExporterSnap, "restart")
     mock_dump = mocker.patch.object(exporter.yaml, "safe_dump")
     mock_validate = mocker.patch.object(exporter.ExporterSnap, "validate_config")
     config = {}
@@ -232,6 +233,7 @@ def test_exporter_config_render_defaults():
 
     default_virt_macs = []
     default_match_interfaces = r".*"
+    default_debug = None
 
     expected_config = {
         "customer": {
@@ -252,6 +254,7 @@ def test_exporter_config_render_defaults():
             "virt_macs": default_virt_macs,
             "match_interfaces": default_match_interfaces,
         },
+        "debug": default_debug,
     }
 
     config = exporter.ExporterConfig(
