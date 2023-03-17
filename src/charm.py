@@ -85,7 +85,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Initialize charm."""
         super().__init__(*args)
         self.exporter = ExporterSnap()
-        self.prometheus_target = PrometheusScrapeTarget(self, "prometheus-legacy-scrape")
+        self.prometheus_target = PrometheusScrapeTarget(self, "prometheus-scrape")
         self._snap_path: Optional[str] = None
         self._snap_path_set = False
 
@@ -181,7 +181,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Update scrape target configuration in related Prometheus application.
 
         Note: this function has no effect if there's no application related via
-        'prometheus-legacy-scrape'.
+        'prometheus-scrape'.
         """
         port = self.config["scrape-port"]
         interval_minutes = self.config["scrape-interval"]

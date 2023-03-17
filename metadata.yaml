@@ -34,9 +34,9 @@ resources:
     filename: prometheus-juju-exporter.snap
 
 provides:
-  prometheus-legacy-scrape:
+  prometheus-scrape:  # Relation with legacy "prometheus2" charm
     interface: prometheus
-  prometheus-k8s-scrape:
+  prometheus-k8s-scrape:  # Relation with new "prometheus-k8s" charm
     interface: prometheus_scrape
   grafana-k8s-dashboard:
     interface: grafana_dashboard
