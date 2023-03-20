@@ -128,6 +128,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     password = "bar"
     interval = 5
     prefixes = "TTT:TTT:TTT,FFF:FFF:FFF"
+    match_interfaces = r"^(en[os]|eth)\d+|enp\d+s\d+|enx[0-9a-f]+"
     mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value=ca_cert)
 
     expected_snap_config = {
@@ -147,6 +148,7 @@ def test_generate_exporter_config_complete(harness, mocker):
         },
         "detection": {
             "virt_macs": prefixes.split(","),
+            "match_interfaces": match_interfaces,
         },
     }
 
@@ -161,6 +163,7 @@ def test_generate_exporter_config_complete(harness, mocker):
                 "scrape-interval": interval,
                 "scrape-port": port,
                 "virtual-macs": prefixes,
+                "match-interfaces": match_interfaces,
             }
         )
 

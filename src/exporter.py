@@ -35,6 +35,7 @@ class ExporterConfig(NamedTuple):
     interval: Optional[str] = None
     port: Optional[str] = None
     prefixes: Optional[str] = None
+    match_interfaces: Optional[str] = None
 
     def render(self) -> Dict[str, Dict[str, Union[List[str], str, None]]]:
         """Return dict that can be written to an exporter config file as a yaml."""
@@ -54,7 +55,8 @@ class ExporterConfig(NamedTuple):
                 "port": self.port,
             },
             "detection": {
-                "virt_macs": self.prefixes.split(",") if self.prefixes else self.prefixes,
+                "virt_macs": self.prefixes.split(",") if self.prefixes else [],
+                "match_interfaces": self.match_interfaces or ".*",
             },
         }
 
@@ -79,6 +81,7 @@ class ExporterSnap:
         "exporter.port",
         "exporter.collect_interval",
         "detection.virt_macs",
+        "detection.match_interfaces",
     ]
 
     @property
