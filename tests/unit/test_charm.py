@@ -127,11 +127,13 @@ def test_generate_exporter_config_complete(harness, mocker):
     user = "foo"
     password = "bar"
     interval = 5
+    debug = False
     prefixes = "TTT:TTT:TTT,FFF:FFF:FFF"
     match_interfaces = r"^(en[os]|eth)\d+|enp\d+s\d+|enx[0-9a-f]+"
     mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value=ca_cert)
 
     expected_snap_config = {
+        "debug": debug,
         "customer": {
             "name": customer,
             "cloud_name": cloud,
@@ -155,6 +157,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     with harness.hooks_disabled():
         harness.update_config(
             {
+                "debug": debug,
                 "customer": customer,
                 "cloud-name": cloud,
                 "controller-url": controller,

@@ -26,6 +26,7 @@ class ExporterConfigError(Exception):
 class ExporterConfig(NamedTuple):
     """Data class that holds information required for exporter configuration."""
 
+    debug: Optional[str] = None
     customer: Optional[str] = None
     cloud: Optional[str] = None
     controller: Optional[str] = None
@@ -37,9 +38,10 @@ class ExporterConfig(NamedTuple):
     prefixes: Optional[str] = None
     match_interfaces: Optional[str] = None
 
-    def render(self) -> Dict[str, Dict[str, Union[List[str], str, None]]]:
+    def render(self) -> Dict[str, Union[Dict[str, Union[List[str], str, None]], str, None]]:
         """Return dict that can be written to an exporter config file as a yaml."""
         return {
+            "debug": self.debug,
             "customer": {
                 "name": self.customer,
                 "cloud_name": self.cloud,
@@ -181,7 +183,7 @@ class ExporterSnap:
         with open(self.SNAP_CONFIG_PATH, "w", encoding="utf-8") as config_file:
             yaml.safe_dump(exporter_config, config_file)
 
-        self.start()
+        self.restart()
         logger.info("Exporter configuration updated.")
 
     def restart(self) -> None:

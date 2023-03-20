@@ -5,6 +5,12 @@
 
 options:
   # An example config option to customise the log level of the workload
+  debug:
+    description: |
+      Whether to enable debug mode. If set to True, the snap will produce debug level
+      log messages.
+    type: boolean
+    default: False
   customer:
     description: |
       Name of the customer that will be added as label to collected metrics. It's useful when
