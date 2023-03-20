@@ -62,7 +62,7 @@ options:
   match-interfaces:
     description: |
       Interface names that should be considered when detecting machine type. This
-      option takes regular expression that should match "real" interface on the machines.
+      option takes a regular expression that should match "real" interfaces on the machines.
       Usage of this option prevents virtual interfaces like 'virbr0' to be detected, and
       possibly causing machine to be mislabeled as a VM guest.
       Leaving this option empty will default to matching all interfaces.
