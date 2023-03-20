@@ -63,8 +63,8 @@ options:
     description: |
       Interface names that should be considered when detecting machine type. This
       option takes a regular expression that should match "real" interfaces on the machines.
-      Usage of this option prevents virtual interfaces like 'virbr0' to be detected, and
-      possibly causing machine to be mislabeled as a VM guest.
+      Usage of this option prevents virtual interfaces like 'virbr0' from being considered,
+      avoiding physical machines to be potentially mislabeled as VM guests.
       Leaving this option empty will default to matching all interfaces.
     default: "^(en[os]|eth)\\d+|enp\\d+s\\d+|enx[0-9a-f]+"
     type: string
