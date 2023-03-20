@@ -86,6 +86,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         "scrape-interval": "exporter.collect_interval",
         "scrape-port": "exporter.port",
         "virtual-macs": "detection.virt_macs",
+        "match-interfaces": "detection.match_interfaces",
     }
 
     def __init__(self, *args: Any) -> None:
@@ -182,6 +183,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             interval=self.config.get("scrape-interval"),
             port=self.config.get("scrape-port"),
             prefixes=self.config.get("virtual-macs"),
+            match_interfaces=self.config.get("match-interfaces"),
         )
 
         return config.render()

@@ -101,6 +101,7 @@ def test_validate_config():
         },
         "detection": {
             "virt_macs": "FFF:FFF:FFF",
+            "match_interfaces": r"^(en[os]|eth)\d+|enp\d+s\d+|enx[0-9a-f]+",
         },
     }
 
@@ -216,3 +217,52 @@ def test_exporter_service_running(running, mocker):
 
     assert exporter_.is_running() == running
     mock_service_running.assert_called_once_with(exporter_.service_name)
+
+
+def test_exporter_config_render_defaults():
+    """Test that default values get injected to optional config options."""
+    customer_name = "Test"
+    cloud_name = "Test Cloud"
+    controller_endpoint = "10.0.0.1:17070"
+    ca_cert = "---BEGIN CERT---\ndata\n---END CERT---"
+    username = "admin"
+    password = "pass1"
+    collection_interval = "1"
+    port = "5000"
+
+    default_virt_macs = []
+    default_match_interfaces = r".*"
+
+    expected_config = {
+        "customer": {
+            "name": customer_name,
+            "cloud_name": cloud_name,
+        },
+        "juju": {
+            "controller_endpoint": controller_endpoint,
+            "controller_cacert": ca_cert,
+            "username": username,
+            "password": password,
+        },
+        "exporter": {
+            "collect_interval": collection_interval,
+            "port": port,
+        },
+        "detection": {
+            "virt_macs": default_virt_macs,
+            "match_interfaces": default_match_interfaces,
+        },
+    }
+
+    config = exporter.ExporterConfig(
+        customer=customer_name,
+        cloud=cloud_name,
+        controller=controller_endpoint,
+        ca_cert=ca_cert,
+        user=username,
+        password=password,
+        interval=collection_interval,
+        port=port,
+    )
+
+    assert config.render() == expected_config

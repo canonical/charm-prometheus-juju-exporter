@@ -59,3 +59,12 @@ options:
       This configuration accepts comma-separated MAC prefixes in string format.
     default: "52:54:00,fa:16:3e,06:f1:3a,00:0d:3a,00:50:56"
     type: string
+  match-interfaces:
+    description: |
+      Interface names that should be considered when detecting machine type. This
+      option takes regular expression that should match "real" interface on the machines.
+      Usage of this option prevents virtual interfaces like 'virbr0' to be detected, and
+      possibly causing machine to be mislabeled as a VM guest.
+      Leaving this option empty will default to matching all interfaces.
+    default: "^(en[os]|eth)\\d+|enp\\d+s\\d+|enx[0-9a-f]+"
+    type: string
