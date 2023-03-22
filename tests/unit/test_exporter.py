@@ -220,11 +220,13 @@ def test_exporter_service_running(running, mocker):
     mock_service_running.assert_called_once_with(exporter_.service_name)
 
 
-def test_exporter_config_render_defaults():
+@pytest.mark.parametrize("controller", ["10.0.0.1:17070", "10.0.0.1:17070,10.0.0.2:17070"])
+def test_exporter_config_render_defaults(controller):
     """Test that default values get injected to optional config options."""
     customer_name = "Test"
     cloud_name = "Test Cloud"
-    controller_endpoint = "10.0.0.1:17070"
+    controller_endpoint = controller
+    expected_controller_endpoint = controller.split(",")
     ca_cert = "---BEGIN CERT---\ndata\n---END CERT---"
     username = "admin"
     password = "pass1"
@@ -241,7 +243,7 @@ def test_exporter_config_render_defaults():
             "cloud_name": cloud_name,
         },
         "juju": {
-            "controller_endpoint": controller_endpoint,
+            "controller_endpoint": expected_controller_endpoint,
             "controller_cacert": ca_cert,
             "username": username,
             "password": password,

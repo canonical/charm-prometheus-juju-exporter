@@ -121,6 +121,7 @@ def test_generate_exporter_config_complete(harness, mocker):
     """Test generating complete config file for exporter snap."""
     port = 5000
     controller = "juju-controller:17070"
+    expected_controller = [controller]
     customer = "Test Org"
     cloud = "Test cloud"
     ca_cert = "--- CA CERT DATA ---"
@@ -143,7 +144,7 @@ def test_generate_exporter_config_complete(harness, mocker):
             "port": port,
         },
         "juju": {
-            "controller_endpoint": controller,
+            "controller_endpoint": expected_controller,
             "password": password,
             "username": user,
             "controller_cacert": ca_cert,

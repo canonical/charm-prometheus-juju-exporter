@@ -24,7 +24,11 @@ options:
     default: ""
     type: string
   controller-url:
-    description: Endpoint of a juju controller in format <IP>:<PORT>
+    description: |
+      Endpoint of a juju controller in format <IP>:<PORT>. In case the controller has
+      HA enabled, this option can contain multiple, comma-separated, <IP>:<PORT> values.
+      This is intended only to support HA Juju controller setup, it is not meant to be
+      used for specifying multiple standalone controllers.
     default: ""
     type: string
   controller-ca-cert:

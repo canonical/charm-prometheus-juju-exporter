@@ -47,7 +47,7 @@ class ExporterConfig(NamedTuple):
                 "cloud_name": self.cloud,
             },
             "juju": {
-                "controller_endpoint": self.controller,
+                "controller_endpoint": self.controller.split(",") if self.controller else [],
                 "controller_cacert": self.ca_cert,
                 "username": self.user,
                 "password": self.password,
