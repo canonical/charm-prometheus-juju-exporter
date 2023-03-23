@@ -132,6 +132,11 @@ def test_generate_exporter_config_complete(harness, mocker):
     prefixes = "TTT:TTT:TTT,FFF:FFF:FFF"
     match_interfaces = r"^(en[os]|eth)\d+|enp\d+s\d+|enx[0-9a-f]+"
     mocker.patch.object(harness.charm, "get_controller_ca_cert", return_value=ca_cert)
+    mocker.patch.object(
+        exporter.ExporterConfig,
+        "controller_endpoint",
+        mock.PropertyMock(return_value=expected_controller),
+    )
 
     expected_snap_config = {
         "debug": debug,

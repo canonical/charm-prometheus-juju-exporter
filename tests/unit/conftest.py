@@ -3,6 +3,7 @@
 #
 # Learn more about testing at: https://juju.is/docs/sdk/testing
 """Fixture for charm's unit tests."""
+from typing import Dict
 
 import ops.testing
 import pytest
@@ -28,3 +29,13 @@ def harness(unit_hostname, mocker) -> ops.testing.Harness[PrometheusJujuExporter
 
     harness.cleanup()
     ops.testing.SIMULATE_CAN_CONNECT = False
+
+
+@pytest.fixture(scope="session")
+def snap_info_1_0_1() -> Dict:
+    """Sample output of 'snap info' command for exporter snap v1.0.1."""
+    return {
+        "name": "prometheus-juju-exporter",
+        "summary": "collects and exports juju machine status",
+        "installed": "1.0.1            (31) 20MB -",
+    }

@@ -14,6 +14,7 @@ from typing import Any, Dict, List, NamedTuple, Optional, Union
 import yaml
 from charmhelpers.core import host as ch_host
 from charmhelpers.fetch import snap
+from packaging import version
 
 # Log messages can be retrieved using juju debug-log
 logger = logging.getLogger(__name__)
@@ -21,6 +22,10 @@ logger = logging.getLogger(__name__)
 
 class ExporterConfigError(Exception):
     """Indicates problem with configuration of exporter service."""
+
+
+class ExporterSnapError(Exception):
+    """Indicates problem with exporter snap."""
 
 
 class ExporterConfig(NamedTuple):
@@ -38,6 +43,29 @@ class ExporterConfig(NamedTuple):
     prefixes: Optional[str] = None
     match_interfaces: Optional[str] = None
 
+    @property
+    def controller_endpoint(self) -> Union[str, List[str]]:
+        """Property that renders value for 'juju.controller_endpoint' option.
+
+        Output is determined based on currently installed snap. Only
+        prometheus-juju-exporter > 1.0.1 can accept list of strings in this config option.
+        """
+        if self.controller is None or self.controller == "":
+            return ""
+
+        endpoints: Union[str, List[str]] = self.controller.split(",")
+        current_version = ExporterSnap.version()
+
+        if current_version <= version.parse("1.0.1"):
+            if len(endpoints) > 1:
+                raise ExporterConfigError(
+                    f"Currently installed version of exporter ({current_version}) does "
+                    f"not support HA controller configuration."
+                )
+            endpoints = endpoints[0]
+
+        return endpoints
+
     def render(self) -> Dict[str, Union[Dict[str, Union[List[str], str, None]], str, None]]:
         """Return dict that can be written to an exporter config file as a yaml."""
         return {
@@ -47,7 +75,7 @@ class ExporterConfig(NamedTuple):
                 "cloud_name": self.cloud,
             },
             "juju": {
-                "controller_endpoint": self.controller.split(",") if self.controller else [],
+                "controller_endpoint": self.controller_endpoint,
                 "controller_cacert": self.ca_cert,
                 "username": self.user,
                 "password": self.password,
@@ -185,6 +213,22 @@ class ExporterSnap:
 
         self.restart()
         logger.info("Exporter configuration updated.")
+
+    @classmethod
+    def version(cls) -> version.Version:
+        """Return version of currently installed exporter."""
+        cmd = ["snap", "info", cls.SNAP_NAME]
+        try:
+            raw_output = subprocess.check_output(cmd)
+            snap_info = yaml.safe_load(raw_output)
+        except (subprocess.CalledProcessError, yaml.YAMLError) as exc:
+            raise ExporterSnapError(f"Failed to get exporter snap version: {exc}") from exc
+
+        if "installed" not in snap_info:
+            raise ExporterSnapError("Exporter snap is not installed.")
+
+        snap_version = snap_info["installed"].split()[0]
+        return version.parse(snap_version)
 
     def restart(self) -> None:
         """Restart exporter service."""
