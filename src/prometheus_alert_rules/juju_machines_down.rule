@@ -1,0 +1,7 @@
+alert: JujuMachineAgentsDown
+expr: max(count by (instance) (juju_machine_state{juju_application=~".*",juju_charm=~".*",juju_model=~".*",juju_model_uuid=~".*"} == 0)) > 0
+for: 10m
+labels:
+  severity: warning
+annotations:
+  summary: "One or more juju machine agents are down for more than 10m."
