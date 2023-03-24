@@ -1,5 +1,5 @@
 charmhelpers
-
+packaging
 # pin ops framework version to
 # support bionic deployments
 ops >= 1.5.0,< 2.0.0

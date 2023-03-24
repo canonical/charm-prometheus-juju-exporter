@@ -3,10 +3,13 @@
 #
 # Learn more about testing at: https://juju.is/docs/sdk/testing
 """Unit tests for helper class ExporterSnap that handles actions related to the exporter snap."""
+import subprocess
 from typing import Dict
-from unittest.mock import ANY, mock_open, patch
+from unittest.mock import ANY, PropertyMock, mock_open, patch
 
 import pytest
+import yaml
+from packaging import version
 
 import exporter
 
@@ -220,11 +223,85 @@ def test_exporter_service_running(running, mocker):
     mock_service_running.assert_called_once_with(exporter_.service_name)
 
 
-def test_exporter_config_render_defaults():
+def test_exporter_snap_version_success(snap_info_1_0_1, mocker):
+    """Test successfully detecting exporter snap version."""
+    expected_version = version.parse("1.0.1")
+    cmd_output = yaml.dump(snap_info_1_0_1)
+    mocker.patch.object(exporter.subprocess, "check_output", return_value=cmd_output)
+
+    assert exporter.ExporterSnap.version() == expected_version
+
+
+def test_exporter_snap_version_not_installed(snap_info_1_0_1, mocker):
+    """Test failure to detect exporter snap version when snap is not installed."""
+    snap_info = snap_info_1_0_1.copy()
+    snap_info.pop("installed")
+    cmd_output = yaml.dump(snap_info)
+    mocker.patch.object(exporter.subprocess, "check_output", return_value=cmd_output)
+
+    with pytest.raises(exporter.ExporterSnapError):
+        _ = exporter.ExporterSnap.version()
+
+
+def test_exporter_snap_version_failure(mocker):
+    """Test failure to get snap info when detecting exporter snap version."""
+    err = subprocess.CalledProcessError(1, "snap info", "Command not found")
+    mocker.patch.object(exporter.subprocess, "check_output", side_effect=err)
+
+    with pytest.raises(exporter.ExporterSnapError):
+        _ = exporter.ExporterSnap.version()
+
+
+@pytest.mark.parametrize(
+    "exporter_version, expected_value",
+    [
+        (version.parse("1.0.1"), "10.0.0.1:17070"),
+        (version.parse("1.0.2"), ["10.0.0.1:17070"]),
+    ],
+)
+def test_exporter_config_controller_endpoint(exporter_version, expected_value, mocker):
+    """Test that ExporterConfig.controller_endpoint returns data in correct format.
+
+    Based on the installed version of snap, this property should return:
+    * single string for prometheus-juju-exporter <= 1.0.1
+    * list of string for prometheus-juju-exporter > 1.0.1
+    """
+    mocker.patch.object(exporter.ExporterSnap, "version", return_value=exporter_version)
+    raw_controller_endpoint = "10.0.0.1:17070"
+    config = exporter.ExporterConfig(controller=raw_controller_endpoint)
+
+    assert config.controller_endpoint == expected_value
+
+
+def test_exporter_config_controller_endpoint_incompatible(mocker):
+    """Test incompatibilities between 'controller_endpoint' value and installed exporter.
+
+    Only prometheus-juju-exporter > 1.0.1 can accept comma-separated list of controller
+    endpoints.
+    """
+    exporter_version = version.parse("1.0.1")
+    mocker.patch.object(exporter.ExporterSnap, "version", return_value=exporter_version)
+    invalid_endpoints = "10.0.0.1:17070,10.0.0.2:17070"
+    config = exporter.ExporterConfig(controller=invalid_endpoints)
+
+    with pytest.raises(exporter.ExporterConfigError):
+        _ = config.controller_endpoint
+
+
+@pytest.mark.parametrize("empty_value", ["", None])
+def test_exporter_config_controller_empty_value(empty_value):
+    """Test that ExporterConfig.controller_endpoint returns expected empty value."""
+    expected_empty_value = ""
+    config = exporter.ExporterConfig(controller=empty_value)
+    assert config.controller_endpoint == expected_empty_value
+
+
+def test_exporter_config_render_defaults(mocker):
     """Test that default values get injected to optional config options."""
     customer_name = "Test"
     cloud_name = "Test Cloud"
-    controller_endpoint = "10.0.0.1:17070"
+    controller_endpoint = "10.0.0.1:17070,10.0.0.2:17070"
+    expected_controller_endpoint = controller_endpoint.split(",")
     ca_cert = "---BEGIN CERT---\ndata\n---END CERT---"
     username = "admin"
     password = "pass1"
@@ -235,13 +312,18 @@ def test_exporter_config_render_defaults():
     default_match_interfaces = r".*"
     default_debug = None
 
+    mocker.patch.object(
+        exporter.ExporterConfig,
+        "controller_endpoint",
+        PropertyMock(return_value=expected_controller_endpoint),
+    )
     expected_config = {
         "customer": {
             "name": customer_name,
             "cloud_name": cloud_name,
         },
         "juju": {
-            "controller_endpoint": controller_endpoint,
+            "controller_endpoint": expected_controller_endpoint,
             "controller_cacert": ca_cert,
             "username": username,
             "password": password,
