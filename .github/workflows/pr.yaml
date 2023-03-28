@@ -24,3 +24,4 @@ jobs:
       provider: lxd
       nested-containers: true
       commands: "['make functional']"
+      timeout-minutes: 120
