@@ -16,6 +16,7 @@ __pycache__/
 .tox
 .venv
 reports/
+**/report/
 htmlcov/
 .mypy_cache
 
@@ -35,6 +36,7 @@ repo-info
 # Python builds
 deb_dist/
 dist/
+*.egg-info/
 
 # Snaps
 *.snap
