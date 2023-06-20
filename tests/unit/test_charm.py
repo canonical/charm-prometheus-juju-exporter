@@ -11,6 +11,7 @@ from unittest import mock
 import pytest
 import yaml
 from ops.model import ActiveStatus, BlockedStatus
+from packaging import version
 
 import charm
 import exporter
@@ -64,6 +65,56 @@ def test_snap_path_property(resource_exists, resource_size, is_path_expected, ha
     )
 
     assert harness.charm.snap_path == expected_path
+
+
+@pytest.mark.parametrize(
+    "controller_version, channel",
+    [
+        ("2.6.5", "2.8/stable"),  # In case controller version is 2.6.x, return 2.8/stable
+        ("2.7.6", "2.8/stable"),  # In case controller version is 2.7.x, return 2.8/stable
+        ("2.8.8", "2.8/stable"),  # In case controller version is 2.8.x, return 2.8/stable
+        ("2.9.42.2", "2.9/stable"),  # In case controller version is 2.9.x, return 2.9/stable
+        ("3.0.1", "latest/stable"),  # Otherwise, return latest/stable
+    ],
+)
+def test_snap_channel_property(controller_version, channel, harness, mocker):
+    """Test that 'snap_channel' property returns the correct channel."""
+    mocker.patch.object(
+        harness.charm, "get_controller_version", return_value=version.parse(controller_version)
+    )
+
+    assert harness.charm.snap_channel == channel
+
+
+def test_get_controller_version_success(harness, mocker):
+    """Test successfully parsing controller version data out of an agent.conf file."""
+    charm_path = "/var/lib/juju/agents/unit-0/charm/"
+    agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
+    agent_conf_data = {"upgradedToVersion": "2.9.42.2"}
+    agent_conf_content = yaml.safe_dump(agent_conf_data, indent=2)
+    mocker.patch.object(charm.hookenv, "charm_dir", return_value=charm_path)
+
+    with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
+        expected_controller_version = version.parse(agent_conf_data["upgradedToVersion"])
+        controller_version = harness.charm.get_controller_version()
+        assert controller_version == expected_controller_version
+
+    open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
+
+
+def test_get_controller_version_fail(harness, mocker):
+    """Test failure when controller version can't be parsed out of an agent.conf file."""
+    charm_path = "/var/lib/juju/agents/unit-0/charm/"
+    agent_config_path = pathlib.Path(charm_path).joinpath("../agent.conf")
+    agent_conf_data = {}
+    agent_conf_content = yaml.safe_dump(agent_conf_data, indent=2)
+    mocker.patch.object(charm.hookenv, "charm_dir", return_value=charm_path)
+
+    with mock.patch("builtins.open", mock.mock_open(read_data=agent_conf_content)) as open_mock:
+        with pytest.raises(RuntimeError):
+            harness.charm.get_controller_version()
+
+    open_mock.assert_called_once_with(agent_config_path, "r", encoding="utf-8")
 
 
 def test_get_controller_ca_cert_from_file_success(harness, mocker):
@@ -271,9 +322,11 @@ def test_reconfigure_open_ports(harness, mocker):
 def test_on_install_callback_success(harness, mocker):
     """Test handling of InstallEvent with '_on_install' callback."""
     exporter_install = mocker.patch.object(harness.charm.exporter, "install")
-
+    mocker.patch.object(
+        harness.charm, "get_controller_version", return_value=version.parse("2.9.42.2")
+    )
     harness.charm._on_install(None)
-    exporter_install.assert_called_once_with(harness.charm.snap_path)
+    exporter_install.assert_called_once_with(harness.charm.snap_path, harness.charm.snap_channel)
     assert isinstance(harness.charm.unit.status, charm.MaintenanceStatus)
 
 
@@ -303,6 +356,9 @@ def test_on_stop(harness, mocker):
 def test_on_install_callback_fail(harness, mocker):
     """Test handling of error during InstallEvent."""
     snap_exception = charm.snap.CouldNotAcquireLockException
+    mocker.patch.object(
+        harness.charm, "get_controller_version", return_value=version.parse("2.9.42.2")
+    )
     exporter_install = mocker.patch.object(harness.charm.exporter, "install")
 
     exporter_install.side_effect = snap_exception
