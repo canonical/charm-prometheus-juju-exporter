@@ -74,7 +74,6 @@ def test_snap_path_property(resource_exists, resource_size, is_path_expected, ha
         ("2.7.6", "2.8/stable"),  # In case controller version is 2.7.x, return 2.8/stable
         ("2.8.8", "2.8/stable"),  # In case controller version is 2.8.x, return 2.8/stable
         ("2.9.42.2", "2.9/stable"),  # In case controller version is 2.9.x, return 2.9/stable
-        ("3.0.1", "latest/stable"),  # Otherwise, return latest/stable
     ],
 )
 def test_snap_channel_property(controller_version, channel, harness, mocker):
@@ -84,6 +83,23 @@ def test_snap_channel_property(controller_version, channel, harness, mocker):
     )
 
     assert harness.charm.snap_channel == channel
+
+
+@pytest.mark.parametrize(
+    "controller_version",
+    [
+        "2.5.5",  # Controller version too low
+        "3.0.1",  # Controller version too high
+    ],
+)
+def test_snap_channel_property_incompatible_controller(controller_version, harness, mocker):
+    """Test that 'snap_channel' property raises exception for incompatible controller version."""
+    mocker.patch.object(
+        harness.charm, "get_controller_version", return_value=version.parse(controller_version)
+    )
+
+    with pytest.raises(charm.ControllerIncompatibleError):
+        harness.charm.snap_channel
 
 
 def test_get_controller_version_success(harness, mocker):

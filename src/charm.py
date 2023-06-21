@@ -48,6 +48,10 @@ from exporter import ExporterConfig, ExporterConfigError, ExporterSnap
 logger = logging.getLogger(__name__)
 
 
+class ControllerIncompatibleError(Exception):
+    """The version of the current controller is not supported."""
+
+
 def evaluate_status(func: Callable) -> Callable:
     """Decorate `PrometheusJujuExporterCharm` method to perform status evaluation.
 
@@ -149,20 +153,26 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Get the channel for exporter snap.
 
         The channel is determined by the controller version that the charm is deployed
-        under. In case the controller version is less than 2.9, the snap channel is set
-        to 2.8/stable. Otherwise, the snap channel is set to 2.9/stable.
+        under. In case the controller version is equal or higher than 2.6 and less
+        than 2.9, the snap channel is set to 2.8/stable. In case controller's major and
+        minor version match with 2.9, the snap channel is set to 2.9/stable. Otherwise,
+        raise ControllerIncompatibleError exception.
         """
         controller_version = self.get_controller_version()
 
+        if controller_version < version.parse("2.6"):
+            raise ControllerIncompatibleError(
+                f"Juju controller version {str(controller_version)} is too old "
+                + "and not supported. Please consider make an upgrade.",
+            )
+
+        if controller_version >= version.parse("3.0"):
+            raise ControllerIncompatibleError("Juju controller 3.x is not yet supported")
+
         if controller_version < version.parse("2.9"):
             return "2.8/stable"
-        if (
-            controller_version.major == version.parse("2.9").major
-            and controller_version.minor == version.parse("2.9").minor
-        ):
-            return "2.9/stable"
 
-        return "latest/stable"
+        return "2.9/stable"
 
     def get_controller_version(self) -> version.Version:
         """Return the version of the current controller."""
