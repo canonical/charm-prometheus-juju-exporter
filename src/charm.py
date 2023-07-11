@@ -160,19 +160,16 @@ class PrometheusJujuExporterCharm(CharmBase):
         """
         controller_version = self.get_controller_version()
 
-        if controller_version < version.parse("2.6"):
-            raise ControllerIncompatibleError(
-                f"Juju controller version {str(controller_version)} is too old "
-                + "and not supported. Please consider make an upgrade.",
-            )
+        if controller_version.major == 2:
+            if controller_version.minor in [6, 7, 8]:
+                return "2.8/stable"
+            if controller_version.minor == 9:
+                return "2.9/stable"
 
-        if controller_version >= version.parse("3.0"):
-            raise ControllerIncompatibleError("Juju controller 3.x is not yet supported")
-
-        if controller_version < version.parse("2.9"):
-            return "2.8/stable"
-
-        return "2.9/stable"
+        raise ControllerIncompatibleError(
+            f"Juju controller version {str(controller_version)} is not supported. "
+            + "Current supported versions are: 2.6, 2.7, 2.8, 2.9",
+        )
 
     def get_controller_version(self) -> version.Version:
         """Return the version of the current controller."""
