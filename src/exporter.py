@@ -119,7 +119,9 @@ class ExporterSnap:
         """Return name of the exporter's systemd service."""
         return f"snap.{self.SNAP_NAME}.{self.SNAP_NAME}.service"
 
-    def install(self, snap_path: Optional[str] = None) -> None:
+    def install(
+        self, snap_path: Optional[str] = None, snap_channel: str = "latest/stable"
+    ) -> None:
         """Install prometheus-juju-exporter snap.
 
         This method tries to install snap from local file if parameter :snap_path is provided.
@@ -134,7 +136,7 @@ class ExporterSnap:
             snap.snap_install(snap_path, "--dangerous")
         else:
             logger.info("Installing %s snap from snap store.", self.SNAP_NAME)
-            snap.snap_install(self.SNAP_NAME)
+            snap.snap_install(self.SNAP_NAME, "--channel", snap_channel)
 
     def uninstall(self) -> None:
         """Remove prometheus-juju-exporter snap."""

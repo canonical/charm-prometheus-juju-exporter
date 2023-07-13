@@ -35,6 +35,7 @@ from ops.charm import (
 )
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, ModelError
+from packaging import version
 from prometheus_interface.operator import (
     PrometheusConfigError,
     PrometheusConnected,
@@ -45,6 +46,10 @@ from exporter import ExporterConfig, ExporterConfigError, ExporterSnap
 
 # Log messages can be retrieved using juju debug-log
 logger = logging.getLogger(__name__)
+
+
+class ControllerIncompatibleError(Exception):
+    """The version of the current controller is not supported."""
 
 
 def evaluate_status(func: Callable) -> Callable:
@@ -143,6 +148,41 @@ class PrometheusJujuExporterCharm(CharmBase):
 
         return self._snap_path
 
+    @property
+    def snap_channel(self) -> str:
+        """Get the channel for exporter snap.
+
+        The channel is determined by the controller version that the charm is deployed
+        under. In case the controller version is equal or higher than 2.6 and less
+        than 2.9, the snap channel is set to 2.8/stable. In case controller's major and
+        minor version match with 2.9, the snap channel is set to 2.9/stable. Otherwise,
+        raise ControllerIncompatibleError exception.
+        """
+        controller_version = self.get_controller_version()
+
+        if controller_version.major == 2:
+            if controller_version.minor in [6, 7, 8]:
+                return "2.8/stable"
+            if controller_version.minor == 9:
+                return "2.9/stable"
+
+        raise ControllerIncompatibleError(
+            f"Juju controller version {str(controller_version)} is not supported. "
+            + "Current supported versions are: 2.6, 2.7, 2.8, 2.9",
+        )
+
+    def get_controller_version(self) -> version.Version:
+        """Return the version of the current controller."""
+        agent_conf_path = pathlib.Path(hookenv.charm_dir()).joinpath("../agent.conf")
+        with open(agent_conf_path, "r", encoding="utf-8") as conf_file:
+            agent_conf = yaml.safe_load(conf_file)
+
+        controller_version = agent_conf.get("upgradedToVersion")
+        if not controller_version:
+            raise RuntimeError("Charm failed to fetch controller's version.")
+
+        return version.parse(controller_version)
+
     def get_controller_ca_cert(self) -> str:
         """Get CA certificate used by targeted Juju controller.
 
@@ -226,7 +266,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Install prometheus-juju-exporter snap."""
         self.unit.status = MaintenanceStatus("Installing charm software.")
         try:
-            self.exporter.install(self.snap_path)
+            self.exporter.install(self.snap_path, self.snap_channel)
         except snap.CouldNotAcquireLockException as exc:
             install_source = "local resource" if self.snap_path else "snap store"
             logger.error("Failed to install %s from %s.", self.exporter.SNAP_NAME, install_source)

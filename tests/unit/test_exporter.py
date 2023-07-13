@@ -29,12 +29,12 @@ def test_exporter_snap_install(local_snap, mocker):
 
     exporter_ = exporter.ExporterSnap()
 
-    exporter_.install(snap_path)
+    exporter_.install(snap_path, "2.9/stable")
 
     if local_snap:
         mock_snap_install.assert_called_once_with(snap_path, "--dangerous")
     else:
-        mock_snap_install.assert_called_once_with(exporter_.SNAP_NAME)
+        mock_snap_install.assert_called_once_with(exporter_.SNAP_NAME, "--channel", "2.9/stable")
 
 
 def test_exporter_snap_uninstall(mocker):
