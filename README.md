@@ -7,6 +7,8 @@ Avoid using this README file for information that is maintained or published els
 
 Use links instead.
 -->
+[![Charmhub Badge](https://charmhub.io/prometheus-juju-exporter/badge.svg)](https://charmhub.io/prometheus-juju-exporter)
+[![Release Edge](https://github.com/canonical/charm-prometheus-juju-exporter/actions/workflows/release.yaml/badge.svg)](https://github.com/canonical/charm-prometheus-juju-exporter/actions/workflows/release.yaml)
 
 # prometheus-juju-exporter
 
