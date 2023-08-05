@@ -11,6 +11,8 @@ display-name: Prometheus Juju Exporter
 
 summary: Charm that exports statistics about number of juju-deployed machines
 
+docs: https://discourse.charmhub.io/t/prometheus-juju-exporter-docs-index/11197
+
 description: |
   This charm exposes a `/metrics` endpoint for Prometheus that provides statistics
   about machines deployed by juju controller. It connects to configured juju controller
