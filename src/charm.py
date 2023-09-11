@@ -153,10 +153,18 @@ class PrometheusJujuExporterCharm(CharmBase):
         """Get the channel for exporter snap.
 
         The channel is determined by the controller version that the charm is deployed
-        under. In case the controller version is equal or higher than 2.6 and less
-        than 2.9, the snap channel is set to 2.8/stable. In case controller's major and
-        minor version match with 2.9, the snap channel is set to 2.9/stable. Otherwise,
-        raise ControllerIncompatibleError exception.
+        under.
+
+        In case the controller version is equal or higher than 2.6 and less than 2.9,
+        the snap channel is set to 2.8/stable.
+
+        In case controller's major and minor version match with 2.9, the snap channel
+        is set to 2.9/stable.
+
+        In case the controller version is equal to 3.1, the snap channel is set to
+        3.1/stable.
+
+        Otherwise, raise ControllerIncompatibleError exception.
         """
         controller_version = self.get_controller_version()
 
@@ -165,10 +173,13 @@ class PrometheusJujuExporterCharm(CharmBase):
                 return "2.8/stable"
             if controller_version.minor == 9:
                 return "2.9/stable"
+        elif controller_version.major == 3:
+            if controller_version.minor == 1:
+                return "3.1/stable"
 
         raise ControllerIncompatibleError(
             f"Juju controller version {str(controller_version)} is not supported. "
-            + "Current supported versions are: 2.6, 2.7, 2.8, 2.9",
+            + "Current supported versions are: 2.6, 2.7, 2.8, 2.9, 3.1",
         )
 
     def get_controller_version(self) -> version.Version:

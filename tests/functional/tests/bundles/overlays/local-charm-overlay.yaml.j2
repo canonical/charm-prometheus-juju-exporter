@@ -2,6 +2,9 @@ applications:
   {{ charm_name }}:
     charm: "{{ CHARM_LOCATION }}/{{ charm_name }}.charm"
     num_units: 0
+  juju-local:
+    options:
+      juju-channel: {{ TEST_JUJU_CHANNEL }}
 
 relations:
   - - "ubuntu"
