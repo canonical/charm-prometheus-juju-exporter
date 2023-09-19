@@ -161,8 +161,8 @@ class PrometheusJujuExporterCharm(CharmBase):
         In case controller's major and minor version match with 2.9, the snap channel
         is set to 2.9/stable.
 
-        In case the controller version is equal to 3.1, the snap channel is set to
-        3.1/stable.
+        In case controller's major and minor version match with 3.1, the snap channel
+        is set to 3.1/stable.
 
         Otherwise, raise ControllerIncompatibleError exception.
         """

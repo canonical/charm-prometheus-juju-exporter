@@ -44,7 +44,7 @@ class BasicPrometheusJujuExporterTests(unittest.TestCase):
     def exec_cmd(self, command: str, raise_on_fail: bool = True) -> Dict[str, str]:
         """Execute command on unit as the ubuntu user in the test environment.
 
-        :param command: Juju subcommand (add-model, deploy, ...) including params
+        :param command: command including params
         :param raise_on_fail: If Exception should be raised if command fails.
         :return: Dict containing result of a command {'Code': '', 'Stderr': '', 'Stdout': ''}
         """
