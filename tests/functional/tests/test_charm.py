@@ -41,15 +41,15 @@ class BasicPrometheusJujuExporterTests(unittest.TestCase):
         self.unit = self.get_application_unit(self.NAME)
         self.controller = self.get_application_unit(self.CONTROLLER_APP)
 
-    def exec_juju_cmd(self, subcommand: str, raise_on_fail: bool = True) -> Dict[str, str]:
-        """Execute juju command on nested controller running within test environment.
+    def exec_cmd(self, command: str, raise_on_fail: bool = True) -> Dict[str, str]:
+        """Execute command on unit as the ubuntu user in the test environment.
 
-        :param subcommand: Juju subcommand (add-model, deploy, ...) including params
+        :param command: command including params
         :param raise_on_fail: If Exception should be raised if command fails.
         :return: Dict containing result of a command {'Code': '', 'Stderr': '', 'Stdout': ''}
         """
         controller_id = self.controller.entity_id
-        cmd = f"sudo -u ubuntu juju {subcommand}"
+        cmd = f"sudo -u ubuntu {command}"
 
         result = model.run_on_unit(controller_id, cmd)
 
@@ -104,13 +104,13 @@ class BasicPrometheusJujuExporterTests(unittest.TestCase):
         model_name = "functest"
         logger.info("Adding model %s with %s units to the nested controller.", model_name, count)
 
-        self.exec_juju_cmd(f"add-model {model_name}")
-        self.exec_juju_cmd(f"add-machine -m {model_name} -n {count}")
-        self.exec_juju_cmd(f"wait -m {model_name} --machine-pending-timeout {timeout}")
+        self.exec_cmd(f"juju add-model {model_name}")
+        self.exec_cmd(f"juju add-machine -m {model_name} -n {count}")
+        self.exec_cmd(f"juju-wait -m {model_name} --machine-pending-timeout {timeout}")
 
         self.addCleanup(
-            self.exec_juju_cmd,
-            f"destroy-model -y {model_name} --force --destroy-storage --timeout 10m",
+            self.exec_cmd,
+            f"juju destroy-model -y {model_name} --force --destroy-storage --timeout 10m",
         )
 
     @tenacity.retry(
