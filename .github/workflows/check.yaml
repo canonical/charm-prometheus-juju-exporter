@@ -30,8 +30,10 @@ jobs:
         include:
           - juju-channel: '2.9/stable'
             command: 'make functional'
-          - juju-channel: '3.1/stable'
-            command: 'make functional31'
+          - juju-channel: '3.3/stable'
+            command: 'make functional33-jammy'
+          - juju-channel: '3.3/stable'
+            command: 'make functional33-focal'
     with:
       command: ${{ matrix.command }}
       juju-channel: ${{ matrix.juju-channel }}

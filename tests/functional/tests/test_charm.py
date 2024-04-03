@@ -110,7 +110,7 @@ class BasicPrometheusJujuExporterTests(unittest.TestCase):
 
         self.addCleanup(
             self.exec_cmd,
-            f"juju destroy-model -y {model_name} --force --destroy-storage --timeout 10m",
+            f"juju destroy-model --no-prompt {model_name} --force --destroy-storage --timeout 10m",
         )
 
     @tenacity.retry(
