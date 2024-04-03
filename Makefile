@@ -77,12 +77,16 @@ functional: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH}"
 	@CHARM_LOCATION=${PROJECTPATH} tox -e func -- ${FUNC_ARGS}
 
-functional33: build
+functional33-jammy: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33 -- ${FUNC_ARGS}
+	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-jammy -- ${FUNC_ARGS}
+
+functional33-focal: build
+	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
+	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-focal -- ${FUNC_ARGS}
 
 test: lint unittests functional
 	@echo "Tests completed for charm ${CHARM_NAME}."
 
 # The targets below don't depend on a file
-.PHONY: help dev-environment pre-commit submodules submodules-update clean build lint reformat unittests functional functional33
+.PHONY: help dev-environment pre-commit submodules submodules-update clean build lint reformat unittests functional functional33-jammy functional33-focal
