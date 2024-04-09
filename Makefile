@@ -24,6 +24,8 @@ help:
 	@echo " make reformat - run lint tools to auto format code"
 	@echo " make unittests - run the tests defined in the unittest subdirectory"
 	@echo " make functional - run the tests defined in the functional subdirectory"
+	@echo " make functional31 - run the tests defined in the functional subdirectory with juju 3.1 requirements"
+	@echo " make functional32 - run the tests defined in the functional subdirectory with juju 3.2 requirements"
 	@echo " make functional33 - run the tests defined in the functional subdirectory with juju 3.3 requirements"
 	@echo " make test - run lint, unittests and functional targets"
 	@echo ""
@@ -77,16 +79,20 @@ functional: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH}"
 	@CHARM_LOCATION=${PROJECTPATH} tox -e func -- ${FUNC_ARGS}
 
-functional33-jammy: build
-	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-jammy -- ${FUNC_ARGS}
+functional31: build
+	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.1 requirements"
+	@CHARM_LOCATION=${PROJECTPATH} tox -e func31 -- ${FUNC_ARGS}
 
-functional33-focal: build
+functional32: build
+	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.2 requirements"
+	@CHARM_LOCATION=${PROJECTPATH} tox -e func32 -- ${FUNC_ARGS}
+
+functional33: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-focal -- ${FUNC_ARGS}
+	@CHARM_LOCATION=${PROJECTPATH} tox -e func33 -- ${FUNC_ARGS}
 
 test: lint unittests functional
 	@echo "Tests completed for charm ${CHARM_NAME}."
 
 # The targets below don't depend on a file
-.PHONY: help dev-environment pre-commit submodules submodules-update clean build lint reformat unittests functional functional33-jammy functional33-focal
+.PHONY: help dev-environment pre-commit submodules submodules-update clean build lint reformat unittests functional functional31 functional32 functional33
