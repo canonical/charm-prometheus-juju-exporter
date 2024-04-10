@@ -77,19 +77,19 @@ unittests:
 
 functional: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH}"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func -- ${FUNC_ARGS}
+	@TEST_JUJU_CHANNEL=2.9/stable CHARM_LOCATION=${PROJECTPATH} tox -e func -- ${FUNC_ARGS}
 
 functional31: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.1 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func31 -- ${FUNC_ARGS}
+	@TEST_JUJU_CHANNEL=3.1/stable CHARM_LOCATION=${PROJECTPATH} tox -e func3 -- ${FUNC_ARGS}
 
 functional32: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.2 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func32 -- ${FUNC_ARGS}
+	@TEST_JUJU_CHANNEL=3.2/stable CHARM_LOCATION=${PROJECTPATH} tox -e func3 -- ${FUNC_ARGS}
 
 functional33: build
 	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33 -- ${FUNC_ARGS}
+	@TEST_JUJU_CHANNEL=3.3/stable CHARM_LOCATION=${PROJECTPATH} tox -e func3 -- ${FUNC_ARGS}
 
 test: lint unittests functional
 	@echo "Tests completed for charm ${CHARM_NAME}."
