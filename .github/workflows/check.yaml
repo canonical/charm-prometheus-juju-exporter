@@ -31,11 +31,12 @@ jobs:
           - juju-channel: '2.9/stable'
             command: 'make functional'
           - juju-channel: '3.1/stable'
-            command: 'make functional31'
+            command: 'TEST_JUJU_CHANNEL=3.1/stable make functional3'
           - juju-channel: '3.2/stable'
-            command: 'make functional32'
+            command: 'TEST_JUJU_CHANNEL=3.2/stable make functional3'
           - juju-channel: '3.3/stable'
-            command: 'make functional33'
+            command: 'TEST_JUJU_CHANNEL=3.3/stable make functional3'
+
     with:
       command: ${{ matrix.command }}
       juju-channel: ${{ matrix.juju-channel }}
