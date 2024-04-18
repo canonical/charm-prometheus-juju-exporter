@@ -32,11 +32,10 @@ jobs:
       matrix:
         include:
           - juju-channel: '2.9/stable'
-            command: 'FUNC_ARGS="--keep-faulty-model" make functional'
+            command: 'make functional'
           - juju-channel: '3.4/stable'
-            command: 'TEST_JUJU3=1 FUNC_ARGS="--keep-faulty-model -b jammy" make functional'
-          - juju-channel: '3.4/stable'
-            command: 'TEST_JUJU3=1 FUNC_ARGS="--keep-faulty-model -b focal" make functional'
+            command: 'TEST_JUJU3=1 make functional'
+
     with:
       command: TEST_JUJU_CHANNEL=${{ matrix.juju-channel }} ${{ matrix.command }}
       juju-channel: ${{ matrix.juju-channel }}

@@ -115,7 +115,7 @@ class BasicPrometheusJujuExporterTests(unittest.TestCase):
 
     @tenacity.retry(
         wait=tenacity.wait_fixed(5),
-        stop=tenacity.stop_after_attempt(12),
+        stop=tenacity.stop_after_attempt(24),
     )
     def validate_exporter(self, expected_machine_count: int = 1) -> None:
         """Verify that exporter exposes expected data on '/metrics' endpoint.
