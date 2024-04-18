@@ -5,9 +5,3 @@ applications:
   juju-local:
     options:
       juju-channel: {{ TEST_JUJU_CHANNEL }}
-
-relations:
-  - - "ubuntu"
-    - {{ charm_name }}
-  - - "prometheus"
-    - {{ charm_name }}

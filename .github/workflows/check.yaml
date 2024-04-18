@@ -10,6 +10,10 @@ on:
       - '**.md'
       - '**.rst'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-unit:
     uses: canonical/bootstack-actions/.github/workflows/lint-unit.yaml@v2
@@ -19,7 +23,6 @@ jobs:
         python-version: ['3.8', '3.10']
     with:
       python-version: ${{ matrix.python-version }}
-      tox-version: '<4'
 
   func:
     uses: canonical/bootstack-actions/.github/workflows/func.yaml@v2
@@ -29,16 +32,15 @@ jobs:
       matrix:
         include:
           - juju-channel: '2.9/stable'
-            command: 'make functional'
-          - juju-channel: '3.3/stable'
-            command: 'make functional33-jammy'
-          - juju-channel: '3.3/stable'
-            command: 'make functional33-focal'
+            command: 'FUNC_ARGS="--keep-faulty-model juju_29"make functional'
+          - juju-channel: '3.4/stable'
+            command: 'TEST_JUJU3=1 FUNC_ARGS="--keep-faulty-model -b jammy" make functional'
+          - juju-channel: '3.4/stable'
+            command: 'TEST_JUJU3=1 FUNC_ARGS="--keep-faulty-model -b focal" make functional'
     with:
-      command: ${{ matrix.command }}
+      command: TEST_JUJU_CHANNEL=${{ matrix.juju-channel }} ${{ matrix.command }}
       juju-channel: ${{ matrix.juju-channel }}
       nested-containers: true
       provider: 'lxd'
       python-version: '3.10'
       timeout-minutes: 120
-      tox-version: '<4'

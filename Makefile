@@ -24,7 +24,6 @@ help:
 	@echo " make reformat - run lint tools to auto format code"
 	@echo " make unittests - run the tests defined in the unittest subdirectory"
 	@echo " make functional - run the tests defined in the functional subdirectory"
-	@echo " make functional33 - run the tests defined in the functional subdirectory with juju 3.3 requirements"
 	@echo " make test - run lint, unittests and functional targets"
 	@echo ""
 
@@ -73,17 +72,9 @@ unittests:
 	@echo "Running unit tests"
 	@tox -e unit -- ${UNIT_ARGS}
 
-functional: build
+functional:
 	@echo "Executing functional tests using built charm at ${PROJECTPATH}"
 	@CHARM_LOCATION=${PROJECTPATH} tox -e func -- ${FUNC_ARGS}
-
-functional33-jammy: build
-	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-jammy -- ${FUNC_ARGS}
-
-functional33-focal: build
-	@echo "Executing functional tests using built charm at ${PROJECTPATH} with juju 3.3 requirements"
-	@CHARM_LOCATION=${PROJECTPATH} tox -e func33-focal -- ${FUNC_ARGS}
 
 test: lint unittests functional
 	@echo "Tests completed for charm ${CHARM_NAME}."
