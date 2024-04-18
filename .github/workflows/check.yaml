@@ -32,7 +32,7 @@ jobs:
       matrix:
         include:
           - juju-channel: '2.9/stable'
-            command: 'FUNC_ARGS="--keep-faulty-model juju_29"make functional'
+            command: 'FUNC_ARGS="--keep-faulty-model" make functional'
           - juju-channel: '3.4/stable'
             command: 'TEST_JUJU3=1 FUNC_ARGS="--keep-faulty-model -b jammy" make functional'
           - juju-channel: '3.4/stable'
