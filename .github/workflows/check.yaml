@@ -30,11 +30,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - juju-channel: '2.9/stable'
-            command: 'make functional'
-          - juju-channel: '3.4/stable'
-            command: 'TEST_JUJU3=1 make functional'
+        juju-channel: ['3.1/stable', '3.2/stable', '3.3/stable', '3.4/stable']
+        command: ['TEST_JUJU3=1 make functional']
 
     with:
       command: TEST_JUJU_CHANNEL=${{ matrix.juju-channel }} ${{ matrix.command }}
