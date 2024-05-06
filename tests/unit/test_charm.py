@@ -74,10 +74,10 @@ def test_snap_path_property(resource_exists, resource_size, is_path_expected, ha
         ("2.7.6", "2.8/stable"),  # In case controller version is 2.7.x, return 2.8/stable
         ("2.8.8", "2.8/stable"),  # In case controller version is 2.8.x, return 2.8/stable
         ("2.9.42.2", "2.9/stable"),  # In case controller version is 2.9.x, return 2.9/stable
-        ("3.1.5", "3.1/stable"),  # In case controller version is 3.1.5, return 3.1/stable
-        ("3.2.5", "3.2/stable"),  # In case controller version is 3.2.5, return 3.2/stable
-        ("3.3.4", "3.3/stable"),  # In case controller version is 3.3.4, return 3.3/stable
-        ("3.4.1", "3.4/stable"),  # In case controller version is 3.4.1, return 3.4/stable
+        ("3.1.5", "3/stable"),  # In case controller version is 3.1.5, return 3/stable
+        ("3.2.5", "3/stable"),  # In case controller version is 3.2.5, return 3/stable
+        ("3.3.4", "3/stable"),  # In case controller version is 3.3.4, return 3/stable
+        ("3.4.1", "3/stable"),  # In case controller version is 3.4.1, return 3/stable
     ],
 )
 def test_snap_channel_property(controller_version, channel, harness, mocker):
