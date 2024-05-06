@@ -175,7 +175,7 @@ class PrometheusJujuExporterCharm(CharmBase):
                 return "2.9/stable"
         elif controller_version.major == 3:
             if controller_version.minor in range(1, 6):
-                return f"3/stable"
+                return "3/stable"
 
         raise ControllerIncompatibleError(
             f"Juju controller version {str(controller_version)} is not supported. "
