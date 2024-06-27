@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           # prometheus_interface library is a submodule
-          submodules: recursive
+          submodules: true
       - name: Initialize lxd  # This should dropped once it's implemented on charming-actions itself. https://github.com/canonical/charming-actions/issues/140
         uses: canonical/setup-lxd@v0.1.1
       - name: Upload charm to charmhub

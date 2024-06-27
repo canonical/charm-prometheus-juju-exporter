@@ -95,11 +95,14 @@ make build
 ### Step 1 - Clone and build the charm
 Clone this repository (if you haven't already) and run `make build`.
 
+NOTE: this repository includes submodules.
+It is important that these are checked out before building the charm.
+The `build` make target will init and update the submodules as a dependency,
+or you can manually run `make submodules` or use the `git submodule` commands directly.
+
 ```bash
 git clone https://github.com/canonical/charm-prometheus-juju-exporter.git
 cd charm-prometheus-juju-exporter/
-git submodule init
-git submodule update
 make build
 ```
 ### Step 2 - Deploy charm with snap as a resource
