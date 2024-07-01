@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        juju-channel: ['3.4/stable']
+        juju-channel: ['3.4/stable', '3.5/stable']
         command: ['TEST_JUJU3=1 make functional']
 
     with:
