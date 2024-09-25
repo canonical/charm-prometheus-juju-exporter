@@ -212,6 +212,7 @@ class ExporterSnap:
 
         with open(self.SNAP_CONFIG_PATH, "w", encoding="utf-8") as config_file:
             yaml.safe_dump(exporter_config, config_file)
+        os.chmod(self.SNAP_CONFIG_PATH, 0o600)
 
         self.restart()
         logger.info("Exporter configuration updated.")
