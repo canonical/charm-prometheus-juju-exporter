@@ -123,6 +123,7 @@ def test_apply_config_success(mocker):
     mock_start = mocker.patch.object(exporter.ExporterSnap, "restart")
     mock_dump = mocker.patch.object(exporter.yaml, "safe_dump")
     mock_validate = mocker.patch.object(exporter.ExporterSnap, "validate_config")
+    mock_os_chmod = mocker.patch.object(exporter.os, "chmod")
     config = {"valid": "config"}
     exporter_ = exporter.ExporterSnap()
 
@@ -133,6 +134,7 @@ def test_apply_config_success(mocker):
         mock_validate.assert_called_once_with(config)
         mock_dump.assert_called_once_with(config, ANY)
         file_.assert_called_once_with(exporter_.SNAP_CONFIG_PATH, "w", encoding="utf-8")
+        mock_os_chmod.assert_called_once_with(exporter_.SNAP_CONFIG_PATH, 0o600)
         mock_start.assert_called_once_with()
 
 
