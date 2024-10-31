@@ -84,7 +84,7 @@ jobs:
       matrix:
         runs-on: [[ubuntu-22.04]]
         test-command: ['TEST_JUJU3=1 make functional']
-        juju-channel: ['3.4/stable', '3.5/stable']]
+        juju-channel: ["3.4/stable", "3.5/stable"]
     steps:
 
       - uses: actions/checkout@v4
