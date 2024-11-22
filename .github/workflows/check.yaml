@@ -83,8 +83,8 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [[ubuntu-22.04]]
-        test-command: ['TEST_JUJU3=1 make functional']
-        juju-channel: ["3.4/stable", "3.5/stable"]
+        test-command: ['tox -e func']
+        juju-channel: ["2.9/stable", "3.4/stable", "3.5/stable"]
     steps:
 
       - uses: actions/checkout@v4
@@ -109,12 +109,15 @@ jobs:
           juju-channel: ${{ matrix.juju-channel }}
           charmcraft-channel: "2.x/stable"
 
-        # This is used by zaza in the functional tests for non-amd64 architectures (if applicable)
+        # These environments are used by zaza in the functional tests (if applicable)
       - name: Set zaza juju model constraints for architecture
         run: |
           if [ "$(uname -m)" = "aarch64" ]; then
             echo "TEST_MODEL_CONSTRAINTS=arch=arm64" >> "$GITHUB_ENV"
           fi
+          if [[ "${{ matrix.juju-channel }}" =~ 3\.[0-9]+\/stable ]]; then
+            echo "TEST_JUJU3=1" >> "$GITHUB_ENV"  # https://github.com/openstack-charmers/zaza/pull/653
+          if
 
       - name: Build the charm
         run: charmcraft -v pack
@@ -131,9 +134,10 @@ jobs:
           echo "$CHARM_PATH_JAMMY"
           export CHARM_PATH_FOCAL="$(pwd)/$(ls | grep '.*20.04.*\.charm$')"
           echo "$CHARM_PATH_FOCAL"
+          export CHARM_PATH_FOCAL="$(pwd)/$(ls | grep '.*18.04.*\.charm$')"
+          echo "$CHARM_PATH_BIONIC"
           ${{ matrix.test-command }}
         env:
-          TEST_JUJU3: "1"  # https://github.com/openstack-charmers/zaza/pull/653
           TEST_JUJU_CHANNEL: ${{ matrix.juju-channel }}
 
       # Save output for debugging
