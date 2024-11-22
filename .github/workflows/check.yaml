@@ -134,7 +134,7 @@ jobs:
           echo "$CHARM_PATH_JAMMY"
           export CHARM_PATH_FOCAL="$(pwd)/$(ls | grep '.*20.04.*\.charm$')"
           echo "$CHARM_PATH_FOCAL"
-          export CHARM_PATH_FOCAL="$(pwd)/$(ls | grep '.*18.04.*\.charm$')"
+          export CHARM_PATH_BIONIC="$(pwd)/$(ls | grep '.*18.04.*\.charm$')"
           echo "$CHARM_PATH_BIONIC"
           ${{ matrix.test-command }}
         env:
