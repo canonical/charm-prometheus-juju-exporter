@@ -109,6 +109,17 @@ jobs:
           juju-channel: ${{ matrix.juju-channel }}
           charmcraft-channel: "2.x/stable"
 
+      - name: Enabled nested LXD containers
+        run: |
+          # create new lxd project and configure nesting & privileged
+          lxc profile show default > default-lxc-profile.yaml
+          lxc project create nested-lxd
+          lxc profile edit --project nested-lxd default < default-lxc-profile.yaml
+          lxc profile set --project nested-lxd default security.nesting=true
+          lxc profile set --project nested-lxd default security.privileged=true
+          # set default project to be nested-lxd project
+          juju model-default project=nested-lxd
+
         # These environments are used by zaza in the functional tests (if applicable)
       - name: Set zaza related environments
         run: |
