@@ -218,7 +218,7 @@ class ExporterSnap:
         logger.info("Exporter configuration updated.")
 
     @classmethod
-    def version(cls) -> version.Version:
+    def version(cls) -> version.Version:  # type:ignore[return-value,unused-ignore]
         """Return version of currently installed exporter."""
         cmd = ["snap", "info", cls.SNAP_NAME]
         try:
