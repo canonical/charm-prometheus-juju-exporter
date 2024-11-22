@@ -1,5 +1,8 @@
 charmhelpers
-packaging
+# Build on ubuntu@20.04 since charmcraft does not support build on ubuntu@18.04 anymore.
+# and require packaging < 22.0 to run on ubuntu@18.04 (python 3.6.x)
+packaging < 22.0; python_version<"3.9"
+packaging >= 2.24; python_version>="3.7"
 # pin ops framework version to
 # support bionic deployments
 ops >= 1.5.0,< 2.0.0
