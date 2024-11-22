@@ -3,6 +3,7 @@ charm_name: prometheus-juju-exporter
 gate_bundles:
   - jammy
   - focal
+  - bionic
 
 tests:
   - tests.test_charm.BasicPrometheusJujuExporterTests
