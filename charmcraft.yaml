@@ -16,18 +16,16 @@ bases:
         channel: "22.04"
         architectures:
           - amd64
-      - name: ubuntu
-        channel: "20.04"
-        architectures:
-          - amd64
-  # charmcraft 2.x/3.x cannot build on 18.04, this is exception for this charm because we still
-  # need to support ubuntu 18.04
   - build-on:
     - name: ubuntu
       channel: "20.04"
       architectures: ["amd64"]
     run-on:
       - name: ubuntu
-        channel: "18.04"
+        channel: "20.04"
+        architectures:
+          - amd64
+      - name: ubuntu
+        channel: "18.04"  # cannot build on and run on 18.04 anymore
         architectures:
           - amd64
