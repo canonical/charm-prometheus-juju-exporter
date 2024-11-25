@@ -192,7 +192,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         if not controller_version:
             raise RuntimeError("Charm failed to fetch controller's version.")
 
-        return version.parse(controller_version)
+        return version.Version(controller_version)
 
     def get_controller_ca_cert(self) -> str:
         """Get CA certificate used by targeted Juju controller.
