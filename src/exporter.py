@@ -56,7 +56,7 @@ class ExporterConfig(NamedTuple):
         endpoints: Union[str, List[str]] = self.controller.split(",")
         current_version = ExporterSnap.version()
 
-        if current_version <= version.parse("1.0.1"):
+        if current_version <= version.Version("1.0.1"):
             if len(endpoints) > 1:
                 raise ExporterConfigError(
                     f"Currently installed version of exporter ({current_version}) does "
@@ -231,7 +231,7 @@ class ExporterSnap:
             raise ExporterSnapError("Exporter snap is not installed.")
 
         snap_version = snap_info["installed"].split()[0]
-        return version.parse(snap_version)
+        return version.Version(snap_version)
 
     def restart(self) -> None:
         """Restart exporter service."""
