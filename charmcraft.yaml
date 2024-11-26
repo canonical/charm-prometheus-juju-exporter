@@ -16,16 +16,11 @@ bases:
         channel: "22.04"
         architectures:
           - amd64
-  - build-on:
-    - name: ubuntu
-      channel: "20.04"
-      architectures: ["amd64"]
-    run-on:
       - name: ubuntu
         channel: "20.04"
         architectures:
           - amd64
       - name: ubuntu
-        channel: "18.04"  # cannot build on and run on 18.04 anymore
+        channel: "18.04"
         architectures:
           - amd64

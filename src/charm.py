@@ -182,7 +182,7 @@ class PrometheusJujuExporterCharm(CharmBase):
             + "Current supported versions are: 2.6, 2.7, 2.8, 2.9, 3.1, 3.2, 3.3, 3.4, 3.5",
         )
 
-    def get_controller_version(self) -> Any:
+    def get_controller_version(self) -> version.Version:
         """Return the version of the current controller."""
         agent_conf_path = pathlib.Path(hookenv.charm_dir()).joinpath("../agent.conf")
         with open(agent_conf_path, "r", encoding="utf-8") as conf_file:
@@ -192,7 +192,7 @@ class PrometheusJujuExporterCharm(CharmBase):
         if not controller_version:
             raise RuntimeError("Charm failed to fetch controller's version.")
 
-        return version.parse(controller_version)
+        return version.Version(controller_version)
 
     def get_controller_ca_cert(self) -> str:
         """Get CA certificate used by targeted Juju controller.
