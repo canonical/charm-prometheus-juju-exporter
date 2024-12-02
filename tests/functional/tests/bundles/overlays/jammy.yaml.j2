@@ -1,2 +1,8 @@
 series: jammy
 
+applications:
+  {{ charm_name }}:
+    charm: "{{ CHARM_PATH_JAMMY }}"
+  juju-local:
+    options:
+      juju-channel: {{ TEST_JUJU_CHANNEL }}
