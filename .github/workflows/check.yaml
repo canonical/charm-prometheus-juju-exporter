@@ -84,7 +84,7 @@ jobs:
       matrix:
         runs-on: [[ubuntu-22.04]]
         test-command: ['tox -e func']
-        juju-channel: ["2.9/stable", "3.4/stable", "3.5/stable"]
+        juju-channel: ["2.9/stable", "3.4/stable", "3.5/stable", "3.6/stable"]
     steps:
 
       - uses: actions/checkout@v4
