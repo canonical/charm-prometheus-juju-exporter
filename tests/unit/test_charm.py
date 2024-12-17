@@ -78,6 +78,7 @@ def test_snap_path_property(resource_exists, resource_size, is_path_expected, ha
         ("3.2.5", "3/stable"),  # In case controller version is 3.2.5, return 3/stable
         ("3.3.4", "3/stable"),  # In case controller version is 3.3.4, return 3/stable
         ("3.4.1", "3/stable"),  # In case controller version is 3.4.1, return 3/stable
+        ("3.6.0", "3/stable"),  # In case controller version is 3.6.0, return 3/stable
     ],
 )
 def test_snap_channel_property(controller_version, channel, harness, mocker):
@@ -93,7 +94,7 @@ def test_snap_channel_property(controller_version, channel, harness, mocker):
     "controller_version",
     [
         "2.5.5",  # Controller version too low
-        "3.0.1",  # Controller version too high
+        "4.0.1",  # Controller version too high
     ],
 )
 def test_snap_channel_property_incompatible_controller(controller_version, harness, mocker):
