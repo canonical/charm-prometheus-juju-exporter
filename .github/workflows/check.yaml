@@ -107,7 +107,7 @@ jobs:
         with:
           provider: "lxd"
           juju-channel: ${{ matrix.juju-channel }}
-          charmcraft-channel: "2.x/stable"
+          charmcraft-channel: "3.x/stable"
 
       - name: Enabled nested LXD containers
         run: |
