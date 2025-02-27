@@ -12,6 +12,9 @@ Use links instead.
 
 # prometheus-juju-exporter
 
+> [!NOTE]
+> This charm is under maintenance mode. Only critical bug will be handled.
+
 This charm collects statistics about machines deployed by juju controller and exports them as a
 Prometheus metrics.
 
