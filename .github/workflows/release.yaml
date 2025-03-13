@@ -28,7 +28,7 @@ jobs:
       - name: Download the tested charms
         uses: actions/download-artifact@v4
         with:
-          pattern: charm_*
+          pattern: built_charms_*
           merge-multiple: true
 
       - name: List the names of the tested charms
