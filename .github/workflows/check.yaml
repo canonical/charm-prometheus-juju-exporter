@@ -178,6 +178,8 @@ jobs:
           fi
           if [[ "${{ matrix.juju-channel }}" =~ 3\.[0-9]+\/stable ]]; then
             echo "TEST_JUJU3=1" >> "$GITHUB_ENV"  # https://github.com/openstack-charmers/zaza/pull/653
+          else
+            echo "TEST_JUJU3=0" >> "$GITHUB_ENV"
           fi
 
       - name: Download the built charms
