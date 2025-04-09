@@ -191,6 +191,9 @@ jobs:
         run: |
           ls *.charm
 
+      - name: Debug env
+        run: env | grep TEST_JUJU3
+
       - name: Run tests
         run: |
           # These variables are for a consistent method to find the charm file(s) across all projects.
