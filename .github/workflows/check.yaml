@@ -296,7 +296,7 @@ jobs:
         uses: tiobe/tics-github-action@v3
         with:
           mode: qserver
-          project: charm-duplicity
+          project: charm-prometheus-juju-exporter
           viewerUrl: https://canonical.tiobe.com/tiobeweb/TICS/api/cfg?name=default
           branchdir: ${{ github.workspace }}
           ticsAuthToken: ${{ secrets.TICSAUTHTOKEN }}
